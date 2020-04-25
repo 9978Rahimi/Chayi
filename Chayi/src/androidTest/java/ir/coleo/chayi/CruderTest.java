@@ -1,8 +1,6 @@
-package ir.coleo.blackbox;
+package ir.coleo.chayi;
 
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class CruderTest {
 

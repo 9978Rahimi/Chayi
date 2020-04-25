@@ -1,3 +1,3 @@
-include ':BlackBox'
+include ':Chayi'
 include ':app'
 rootProject.name = "Alexa"
