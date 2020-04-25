@@ -1,2 +1,3 @@
+include ':BlackBox'
 include ':app'
 rootProject.name = "Alexa"
