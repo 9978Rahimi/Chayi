@@ -14,6 +14,7 @@ public class RetrofitSingleTone {
     private static RetrofitSingleTone object;
     private Retrofit retrofit;
     private Gson gson;
+    private ChayiInterface chayiInterface;
 
     private RetrofitSingleTone() {
         this.baseUrl = Constants.base_url;
@@ -25,6 +26,7 @@ public class RetrofitSingleTone {
                 .excludeFieldsWithModifiers(Modifier.STATIC)
                 .serializeNulls()
                 .create();
+        chayiInterface = retrofit.create(ChayiInterface.class);
     }
 
     //todo validate base url
@@ -42,5 +44,9 @@ public class RetrofitSingleTone {
 
     public Gson getGson() {
         return gson;
+    }
+
+    public ChayiInterface getChayiInterface() {
+        return chayiInterface;
     }
 }

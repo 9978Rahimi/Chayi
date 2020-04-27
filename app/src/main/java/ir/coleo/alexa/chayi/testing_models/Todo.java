@@ -12,7 +12,7 @@ public class Todo extends Chayi {
 
     @Override
     public String getUrl() {
-        return "todos/" + getId();
+        return urlAll + "/" + getId();
     }
 
     @Override

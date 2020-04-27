@@ -15,7 +15,6 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public abstract class Chayi {
 
@@ -42,14 +41,33 @@ public abstract class Chayi {
 
     public void getRequest(SingleChayiCallBack callBack) {
         String url = getUrl();
-        Log.i(TAG, "getRequest: " + url);
+        ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
+
+        Call<ResponseBody> repos = chayiInterface.get(url);
+        repos.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    assert response.body() != null;
+                    Chayi newObject = RetrofitSingleTone.getInstance().getGson()
+                            .fromJson(response.body().string(), Chayi.this.getClass());
+
+                    callBack.onResponse(newObject);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
     }
 
     public static void getAllRequest(Class<?> input, ChayiCallBack chayiCallBack) {
         String url = getAllUrl(input);
-        Retrofit retrofit = RetrofitSingleTone.getInstance().getRetrofit();
-
-        ChayiInterface chayiInterface = retrofit.create(ChayiInterface.class);
+        ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 
         Call<ResponseBody> repos = chayiInterface.get(url);
 
@@ -71,7 +89,6 @@ public abstract class Chayi {
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.i(TAG, "onFailure: " + t.getMessage());
-
             }
         });
     }
