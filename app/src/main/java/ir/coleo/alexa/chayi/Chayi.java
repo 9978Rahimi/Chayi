@@ -2,8 +2,6 @@ package ir.coleo.alexa.chayi;
 
 import android.util.Log;
 
-import com.google.gson.Gson;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -11,6 +9,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
+import ir.coleo.alexa.chayi.callBack.ChayiCallBack;
+import ir.coleo.alexa.chayi.callBack.SingleChayiCallBack;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -27,7 +27,25 @@ public abstract class Chayi {
         return this.id;
     }
 
-    public static ArrayList<Chayi> getAllRequest(Class<?> input) {
+    private static String getAllUrl(Class<?> input) {
+        Field allUrl;
+        try {
+            allUrl = input.getField("urlAll");
+            return (String) allUrl.get(null);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public abstract String getUrl();
+
+    public void getRequest(SingleChayiCallBack callBack) {
+        String url = getUrl();
+        Log.i(TAG, "getRequest: " + url);
+    }
+
+    public static void getAllRequest(Class<?> input, ChayiCallBack chayiCallBack) {
         String url = getAllUrl(input);
         Retrofit retrofit = RetrofitSingleTone.getInstance().getRetrofit();
 
@@ -40,13 +58,14 @@ public abstract class Chayi {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 try {
                     assert response.body() != null;
-                    for (Chayi temp: Chayi.AllResponseParser(input,response.body().string())){
+                    ArrayList<Chayi> chayis = Chayi.AllResponseParser(input, response.body().string());
+                    for (Chayi temp : chayis) {
                         Log.i(TAG, "onResponse: " + temp.toString());
                     }
+                    chayiCallBack.onResponse(chayis);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
             }
 
             @Override
@@ -55,19 +74,6 @@ public abstract class Chayi {
 
             }
         });
-
-        return null;
-    }
-
-    private static String getAllUrl(Class<?> input) {
-        Field allUrl;
-        try {
-            allUrl = input.getField("urlAll");
-            return (String) allUrl.get(null);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     private static ArrayList<Chayi> AllResponseParser(Class<?> input, String response) {
@@ -75,7 +81,7 @@ public abstract class Chayi {
             JSONArray array = new JSONArray(response);
             ArrayList<Chayi> list = new ArrayList<>();
             for (int i = 0; i < array.length(); i++) {
-                if (i == 0){
+                if (i == 0) {
                     Log.i(TAG, "AllResponseParser: " + array.getJSONObject(i).toString());
                 }
                 list.add(responseParser(input, array.getJSONObject(i).toString()));

@@ -10,6 +10,10 @@ public class Todo extends Chayi {
     public boolean completed;
     public String title;
 
+    @Override
+    public String getUrl() {
+        return "todos/" + getId();
+    }
 
     @Override
     public String toString() {

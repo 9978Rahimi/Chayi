@@ -6,7 +6,10 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
+
 import ir.coleo.alexa.chayi.Chayi;
+import ir.coleo.alexa.chayi.callBack.ChayiCallBack;
 import ir.coleo.alexa.chayi.testing_models.Todo;
 
 public class MainActivity extends AppCompatActivity {
@@ -27,7 +30,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showMyName() {
-        Chayi.getAllRequest(Todo.class);
+        Chayi.getAllRequest(Todo.class, new ChayiCallBack() {
+
+            @Override
+            public void onResponse(ArrayList<Chayi> chayis) {
+
+            }
+
+            @Override
+            public void fail(String errorMassage) {
+
+            }
+        });
+
     }
 
 }
