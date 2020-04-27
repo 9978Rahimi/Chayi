@@ -6,6 +6,9 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import ir.coleo.alexa.chayi.Chayi;
+import ir.coleo.alexa.chayi.testing_models.Todo;
+
 public class MainActivity extends AppCompatActivity {
 
     private TextView textView;
@@ -24,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showMyName() {
-
+        Chayi.getAllRequest(Todo.class);
     }
 
 }

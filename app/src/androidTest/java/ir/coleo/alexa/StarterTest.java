@@ -27,7 +27,7 @@ public class StarterTest {
     @Test
     public void one(){
         onView(withId(R.id.button)).perform(click());
-        onView(withId(R.id.textView)).check(matches(withText("Ali")));
+        onView(withId(R.id.textView)).check(matches(withText("5")));
     }
 
 }
