@@ -7,6 +7,8 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +16,7 @@ import ir.coleo.alexa.chayi.callBack.ChayiCallBack;
 import ir.coleo.alexa.chayi.callBack.SingleChayiCallBack;
 import ir.coleo.alexa.chayi.constats.ChayiInterface;
 import ir.coleo.alexa.chayi.constats.RetrofitSingleTone;
+import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -45,12 +48,29 @@ public abstract class Chayi {
 
     public abstract RequestBody getJsonObject();
 
-    public void postRequest(SingleChayiCallBack callBack){
-        String url = getUrl();
-        Log.i(TAG, "putRequest: url = " + url);
+    private static RequestBody getCustomRequestBody(Class<?> input, String function) {
+        Method method;
+        try {
+            method = input.getMethod(function);
+            Object output = method.invoke(null);
+            if (output instanceof RequestBody)
+                return (RequestBody) output;
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return RequestBody.create(MediaType.parse("json"), "{}");
+    }
+
+    /**
+     * @apiNote target class that you are calling function on
+     * it should have method with that function name
+     * that return RequestBody type for post request
+     */
+    public static void customPostRequest(SingleChayiCallBack callBack, String function, Class<?> input) {
+        String url = getAllUrl(input) + "/" + function;
         ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 
-        Call<ResponseBody> repos = chayiInterface.put(url, this.getJsonObject());
+        Call<ResponseBody> repos = chayiInterface.post(url, Chayi.getCustomRequestBody(input, function));
 
         repos.enqueue(new Callback<ResponseBody>() {
             @Override

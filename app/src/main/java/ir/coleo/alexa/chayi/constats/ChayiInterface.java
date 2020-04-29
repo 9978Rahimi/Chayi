@@ -20,7 +20,7 @@ public interface ChayiInterface {
     Call<ResponseBody> get(@Url String url);
 
     @POST
-    Call<ResponseBody> post(@Url String url, @Body Chayi chayi);
+    Call<ResponseBody> post(@Url String url, @Body RequestBody chayi);
 
     @PUT
     Call<ResponseBody> put(@Url String url, @Body RequestBody body);

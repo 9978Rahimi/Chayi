@@ -9,7 +9,11 @@ public class Constants {
     private static String TOKEN_STORAGE = "someWhereInDarkness";
     private static String TOKEN_DATA = "someWhereInDarkness12";
 
-    public static String base_url = "https://dev.zimaapp.ir/api/av1/";
+    public static String base_url = null;
+
+    public static void setBase_url(String baseUrl) {
+        Constants.base_url = baseUrl;
+    }
 
     /**
      * گرفتن کلید ارتباط با سرور
