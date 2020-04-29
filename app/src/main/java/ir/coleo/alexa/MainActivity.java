@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void putName() {
         Citizen citizen = new Citizen("09384142925");
-        Chayi.customPostRequest(new SingleChayiCallBack() {
+        citizen.customPostRequest(new SingleChayiCallBack() {
             @Override
             public void onResponse(Chayi chayi) {
 

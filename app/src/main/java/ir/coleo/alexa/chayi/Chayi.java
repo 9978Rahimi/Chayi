@@ -48,11 +48,11 @@ public abstract class Chayi {
 
     public abstract RequestBody getJsonObject();
 
-    private static RequestBody getCustomRequestBody(Class<?> input, String function) {
+    private RequestBody getCustomRequestBody(Class<?> input, String function) {
         Method method;
         try {
             method = input.getMethod(function);
-            Object output = method.invoke(null);
+            Object output = method.invoke(this);
             if (output instanceof RequestBody)
                 return (RequestBody) output;
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
@@ -62,15 +62,16 @@ public abstract class Chayi {
     }
 
     /**
+     * @param function name of api function
      * @apiNote target class that you are calling function on
      * it should have method with that function name
      * that return RequestBody type for post request
      */
-    public static void customPostRequest(SingleChayiCallBack callBack, String function, Class<?> input) {
+    public void customPostRequest(SingleChayiCallBack callBack, String function, Class<?> input) {
         String url = getAllUrl(input) + "/" + function;
         ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 
-        Call<ResponseBody> repos = chayiInterface.post(url, Chayi.getCustomRequestBody(input, function));
+        Call<ResponseBody> repos = chayiInterface.post(url, getCustomRequestBody(input, function));
 
         repos.enqueue(new Callback<ResponseBody>() {
             @Override
