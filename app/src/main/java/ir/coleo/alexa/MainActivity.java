@@ -39,61 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private static String TAG = "TAG";
 
     public void putName() {
-        Todo todo = new Todo(3, false, "nice work");
-//        Call<ResponseBody> call = RetrofitSingleTone.getInstance().getChayiInterface().put(todo.getUrl(), "{todo}");
-//        call.enqueue(new Callback<ResponseBody>() {
-//            @Override
-//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                Log.i(TAG, "onResponse: ");
-//            }
-//
-//            @Override
-//            public void onFailure(Call<ResponseBody> call, Throwable t) {
-//                Log.i(TAG, "onFailure: ");
-//            }
-//        });
-
-        todo.putRequest(new SingleChayiCallBack() {
-            @Override
-            public void onResponse(Chayi chayi) {
-                Log.i(TAG, "onResponse: ");
-            }
-
-            @Override
-            public void fail(String errorMassage) {
-                Log.i(TAG, "fail: ");
-            }
-        });
-
 
     }
 
-    public void showMyName() {
-        Chayi.getAllRequest(Todo.class, new ChayiCallBack() {
-
-            @Override
-            public void onResponse(ArrayList<Chayi> chayis) {
-                Chayi chayi = chayis.get(123);
-                chayi.getRequest(new SingleChayiCallBack() {
-
-                    @Override
-                    public void onResponse(Chayi chayi) {
-                        Log.i("MAIN_ACTIVITY", "onResponse: " + chayi.toString());
-                    }
-
-                    @Override
-                    public void fail(String errorMassage) {
-
-                    }
-                });
-
-            }
-
-            @Override
-            public void fail(String errorMassage) {
-
-            }
-        });
-    }
 
 }

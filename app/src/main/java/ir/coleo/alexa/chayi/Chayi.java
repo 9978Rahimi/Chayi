@@ -45,6 +45,31 @@ public abstract class Chayi {
 
     public abstract RequestBody getJsonObject();
 
+    public void postRequest(SingleChayiCallBack callBack){
+        String url = getUrl();
+        Log.i(TAG, "putRequest: url = " + url);
+        ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
+
+        Call<ResponseBody> repos = chayiInterface.put(url, this.getJsonObject());
+
+        repos.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (handleResponse(response)) {
+                    callBack.onResponse(null);
+                } else {
+                    callBack.fail("");
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+
     public void putRequest(SingleChayiCallBack callBack) {
         String url = getUrl();
         Log.i(TAG, "putRequest: url = " + url);
