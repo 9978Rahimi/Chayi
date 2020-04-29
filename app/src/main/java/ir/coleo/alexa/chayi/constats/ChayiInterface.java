@@ -1,5 +1,6 @@
-package ir.coleo.alexa.chayi;
+package ir.coleo.alexa.chayi.constats;
 
+import ir.coleo.alexa.chayi.Chayi;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;

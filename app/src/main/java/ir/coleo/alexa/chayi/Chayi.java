@@ -11,6 +11,8 @@ import java.util.ArrayList;
 
 import ir.coleo.alexa.chayi.callBack.ChayiCallBack;
 import ir.coleo.alexa.chayi.callBack.SingleChayiCallBack;
+import ir.coleo.alexa.chayi.constats.ChayiInterface;
+import ir.coleo.alexa.chayi.constats.RetrofitSingleTone;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
