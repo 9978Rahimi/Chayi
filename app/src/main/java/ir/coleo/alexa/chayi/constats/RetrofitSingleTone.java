@@ -1,5 +1,7 @@
 package ir.coleo.alexa.chayi.constats;
 
+import android.content.Context;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -15,6 +17,7 @@ public class RetrofitSingleTone {
     private Retrofit retrofit;
     private Gson gson;
     private ChayiInterface chayiInterface;
+    private Context context;
 
     private RetrofitSingleTone() {
         this.baseUrl = Constants.base_url;

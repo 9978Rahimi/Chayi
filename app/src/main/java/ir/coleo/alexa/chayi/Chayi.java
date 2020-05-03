@@ -4,6 +4,7 @@ import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -15,6 +16,7 @@ import java.util.List;
 import ir.coleo.alexa.chayi.callBack.ChayiCallBack;
 import ir.coleo.alexa.chayi.callBack.SingleChayiCallBack;
 import ir.coleo.alexa.chayi.constats.ChayiInterface;
+import ir.coleo.alexa.chayi.constats.Constants;
 import ir.coleo.alexa.chayi.constats.RetrofitSingleTone;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -77,6 +79,7 @@ public abstract class Chayi {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (handleResponse(response)) {
+                    Log.i(TAG, "onResponse: body =" + response.body());
                     callBack.onResponse(null);
                 } else {
                     callBack.fail("");
@@ -114,6 +117,7 @@ public abstract class Chayi {
 
             }
         });
+
     }
 
     public void getRequest(SingleChayiCallBack callBack) {
@@ -205,6 +209,14 @@ public abstract class Chayi {
 
     private static boolean handleResponse(Response<ResponseBody> response) {
         if (response.code() >= 100 && response.code() < 400) {
+            if (response.body() != null) {
+                try {
+                    JSONObject object = new JSONObject(response.body().string());
+                    Constants.setToken(object.getString("token"));
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                }
+            }
             return true;
         } else {
             Log.i(TAG, "handleResponse: code = " + response.code() + " errorBody = " + parseError(response));
