@@ -69,11 +69,15 @@ public abstract class Chayi {
      * it should have method with that function name
      * that return RequestBody type for post request
      */
-    public void customPostRequest(SingleChayiCallBack callBack, String function, Class<?> input) {
+    public void customPostRequest(SingleChayiCallBack callBack, String function, Class<?> input, boolean token) {
         String url = getAllUrl(input) + "/" + function;
         ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 
-        Call<ResponseBody> repos = chayiInterface.post(url, getCustomRequestBody(input, function));
+        Call<ResponseBody> repos;
+        if (token)
+            repos = chayiInterface.post(url, getCustomRequestBody(input, function), Constants.getToken());
+        else
+            repos = chayiInterface.post(url, getCustomRequestBody(input, function));
 
         repos.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -94,12 +98,17 @@ public abstract class Chayi {
         });
     }
 
-    public void putRequest(SingleChayiCallBack callBack) {
+    public void putRequest(SingleChayiCallBack callBack, boolean token) {
         String url = getUrl();
         Log.i(TAG, "putRequest: url = " + url);
         ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 
-        Call<ResponseBody> repos = chayiInterface.put(url, this.getJsonObject());
+        Call<ResponseBody> repos;
+        if (token)
+            repos = chayiInterface.put(url, this.getJsonObject(), Constants.getToken());
+        else
+            repos = chayiInterface.put(url, this.getJsonObject());
+
 
         repos.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -120,11 +129,17 @@ public abstract class Chayi {
 
     }
 
-    public void getRequest(SingleChayiCallBack callBack) {
+    public void getRequest(SingleChayiCallBack callBack, boolean token) {
         String url = getUrl();
         ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 
-        Call<ResponseBody> repos = chayiInterface.get(url);
+        Call<ResponseBody> repos;
+        if (token)
+            repos = chayiInterface.get(url, Constants.getToken());
+        else
+            repos = chayiInterface.get(url);
+
+
         repos.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -151,11 +166,15 @@ public abstract class Chayi {
         });
     }
 
-    public static void getAllRequest(Class<?> input, ChayiCallBack chayiCallBack) {
+    public static void getAllRequest(Class<?> input, ChayiCallBack chayiCallBack, boolean token) {
         String url = getAllUrl(input);
         ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 
-        Call<ResponseBody> repos = chayiInterface.get(url);
+        Call<ResponseBody> repos;
+        if (token)
+            repos = chayiInterface.get(url, Constants.getToken());
+        else
+            repos = chayiInterface.get(url);
 
         repos.enqueue(new Callback<ResponseBody>() {
             @Override

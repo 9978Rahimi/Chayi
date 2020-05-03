@@ -1,8 +1,5 @@
 package ir.coleo.alexa.chayi.constats;
 
-import com.google.gson.JsonObject;
-
-import ir.coleo.alexa.chayi.Chayi;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -19,11 +16,23 @@ public interface ChayiInterface {
     @GET
     Call<ResponseBody> get(@Url String url);
 
+    @GET
+    Call<ResponseBody> get(@Url String url, @Header("token") String token);
+
+    @POST
+    Call<ResponseBody> post(@Url String url, @Body RequestBody chayi, @Header("token") String token);
+
     @POST
     Call<ResponseBody> post(@Url String url, @Body RequestBody chayi);
 
     @PUT
+    Call<ResponseBody> put(@Url String url, @Body RequestBody body, @Header("token") String token);
+
+    @PUT
     Call<ResponseBody> put(@Url String url, @Body RequestBody body);
+
+    @DELETE
+    Call<ResponseBody> delete(@Url String url, @Header("token") String token);
 
     @DELETE
     Call<ResponseBody> delete(@Url String url);

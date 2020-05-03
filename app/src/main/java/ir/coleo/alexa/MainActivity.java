@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
                 public void fail(String errorMassage) {
 
                 }
-            }, "app_check_code", Citizen.class);
+            }, "app_check_code", Citizen.class, false);
         });
     }
 
@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
             public void fail(String errorMassage) {
 
             }
-        }, "app_enter", Citizen.class);
+        }, "app_enter", Citizen.class, false);
     }
 
 
