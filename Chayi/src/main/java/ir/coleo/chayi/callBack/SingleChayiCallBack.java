@@ -1,6 +1,6 @@
 package ir.coleo.chayi.callBack;
 
-import ir.coleo.alexa.chayi.Chayi;
+import ir.coleo.chayi.Chayi;
 
 public interface SingleChayiCallBack extends CallBack {
 

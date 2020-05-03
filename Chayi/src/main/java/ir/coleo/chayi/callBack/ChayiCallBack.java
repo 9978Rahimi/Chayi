@@ -2,7 +2,7 @@ package ir.coleo.chayi.callBack;
 
 import java.util.ArrayList;
 
-import ir.coleo.alexa.chayi.Chayi;
+import ir.coleo.chayi.Chayi;
 
 public interface ChayiCallBack extends CallBack {
 

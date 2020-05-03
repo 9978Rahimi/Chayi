@@ -13,11 +13,11 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import ir.coleo.alexa.chayi.callBack.ChayiCallBack;
-import ir.coleo.alexa.chayi.callBack.SingleChayiCallBack;
-import ir.coleo.alexa.chayi.constats.ChayiInterface;
-import ir.coleo.alexa.chayi.constats.Constants;
-import ir.coleo.alexa.chayi.constats.RetrofitSingleTone;
+import ir.coleo.chayi.callBack.ChayiCallBack;
+import ir.coleo.chayi.callBack.SingleChayiCallBack;
+import ir.coleo.chayi.constats.ChayiInterface;
+import ir.coleo.chayi.constats.Constants;
+import ir.coleo.chayi.constats.RetrofitSingleTone;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;

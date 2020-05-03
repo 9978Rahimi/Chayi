@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private static String TAG = "TAG";
 
     public void putName() {
-      
+
     }
 
 
