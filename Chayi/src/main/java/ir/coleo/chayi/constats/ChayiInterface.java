@@ -1,4 +1,4 @@
-package ir.coleo.alexa.chayi.constats;
+package ir.coleo.chayi.constats;
 
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;

@@ -1,4 +1,4 @@
-package ir.coleo.alexa.chayi;
+package ir.coleo.chayi;
 
 import android.util.Log;
 

@@ -1,4 +1,4 @@
-package ir.coleo.alexa.chayi.constats;
+package ir.coleo.chayi.constats;
 
 import android.content.Context;
 
