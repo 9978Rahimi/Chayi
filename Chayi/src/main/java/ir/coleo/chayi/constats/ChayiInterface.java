@@ -13,26 +13,27 @@ import retrofit2.http.Url;
 
 public interface ChayiInterface {
 
+
     @GET
     Call<ResponseBody> get(@Url String url);
 
     @GET
-    Call<ResponseBody> get(@Url String url, @Header("token") String token);
+    Call<ResponseBody> get(@Url String url, @Header("Authorization") String token);
 
     @POST
-    Call<ResponseBody> post(@Url String url, @Body RequestBody chayi, @Header("token") String token);
+    Call<ResponseBody> post(@Url String url, @Body RequestBody chayi, @Header("Authorization") String token);
 
     @POST
     Call<ResponseBody> post(@Url String url, @Body RequestBody chayi);
 
     @PUT
-    Call<ResponseBody> put(@Url String url, @Body RequestBody body, @Header("token") String token);
+    Call<ResponseBody> put(@Url String url, @Body RequestBody body, @Header("Authorization") String token);
 
     @PUT
     Call<ResponseBody> put(@Url String url, @Body RequestBody body);
 
     @DELETE
-    Call<ResponseBody> delete(@Url String url, @Header("token") String token);
+    Call<ResponseBody> delete(@Url String url, @Header("Authorization") String token);
 
     @DELETE
     Call<ResponseBody> delete(@Url String url);

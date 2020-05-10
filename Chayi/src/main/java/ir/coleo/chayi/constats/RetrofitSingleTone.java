@@ -12,8 +12,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitSingleTone {
 
-    private String baseUrl;
     private static RetrofitSingleTone object;
+    private String baseUrl;
     private Retrofit retrofit;
     private Gson gson;
     private ChayiInterface chayiInterface;
@@ -27,6 +27,7 @@ public class RetrofitSingleTone {
                 .build();
         gson = new GsonBuilder()
                 .excludeFieldsWithModifiers(Modifier.STATIC)
+                .excludeFieldsWithoutExposeAnnotation()
                 .serializeNulls()
                 .create();
         chayiInterface = retrofit.create(ChayiInterface.class);

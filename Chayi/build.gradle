@@ -1,5 +1,7 @@
 plugins {
     id 'com.android.library'
+    id 'com.github.dcendents.android-maven'
+    id 'com.jfrog.bintray'
 }
 android {
     compileSdkVersion 29
@@ -46,6 +48,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit-ktx:' + rootProject.extJUnitVersion
     androidTestImplementation 'androidx.test:runner:' + rootProject.runnerVersion
     androidTestImplementation 'androidx.test.espresso:espresso-core:' + rootProject.espressoVersion
+    implementation 'com.github.hatamiarash7:RTL-Toast:1.3'
 
     implementation 'com.squareup.retrofit2:retrofit:2.8.1'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
@@ -53,4 +56,80 @@ dependencies {
 
 }
 
-apply from: 'publish.gradle'
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+group = 'ir.coleo.chayi'
+version = '0.2.3'
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            name 'Chayi'
+            description 'A library for Http client connection'
+            url 'https://github.com/9978Rahimi/Chayi'
+            inceptionYear '2020'
+
+            packaging 'aar'
+            groupId 'ir.coleo.chayi'
+            artifactId 'Chayi'
+            version '0.2.3'
+
+            licenses {
+                license {
+                    name 'The MIT License (MIT)'
+                    url 'https://opensource.org/licenses/MIT'
+                }
+            }
+            scm {
+                url 'https://github.com/9978Rahimi/Chayi'
+            }
+            developers {
+                developer {
+                    id = '9978Rahimi'
+                    name 'Alireza'
+                }
+            }
+        }
+    }
+}
+
+Properties bintrayProperties = new Properties()
+bintrayProperties.load(project.rootProject.file('bintray.properties').newDataInputStream())
+
+bintray {
+    user = bintrayProperties.getProperty('user')
+    key = bintrayProperties.get('key')
+    configurations = ['archives']
+    pkg {
+        repo = 'myRepo'
+        name = 'Chayi'
+        userOrg = 'rahimialireza'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/9978Rahimi/Chayi'
+        publish = true
+        version {
+            name = '0.2.3'
+            desc = 'nothing'
+            released = new Date()
+            vcsTag = 'v0.2.3'
+        }
+    }
+}
