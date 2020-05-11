@@ -28,6 +28,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.internal.EverythingIsNonNull;
 
 public abstract class Chayi {
 
@@ -74,6 +75,7 @@ public abstract class Chayi {
 
         repos.enqueue(new Callback<ResponseBody>() {
             @Override
+            @EverythingIsNonNull
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 try {
                     JSONObject responseObject = new JSONObject(response.body().string());
@@ -89,14 +91,13 @@ public abstract class Chayi {
 
                     }
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
+                } catch (IOException | JSONException e) {
                     e.printStackTrace();
                 }
             }
 
             @Override
+            @EverythingIsNonNull
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.i(TAG, "onFailure: " + t.getMessage());
             }
@@ -206,13 +207,35 @@ public abstract class Chayi {
         return RequestBody.create(MediaType.parse("json"), object.toString());
     }
 
-    private RequestBody getCustomRequestBody(Class<?> input, String function) {
-        Method method;
+
+    private static RequestBody getCustomRequestBody(Class<?> input, String function, String... args) {
+        Method[] methods;
+        Method target = null;
         try {
-            method = input.getMethod(function);
-            Object output = method.invoke(this);
+            methods = input.getMethods();
+            for (Method method : methods) {
+                if (method.getName().equals(function + "_request")) {
+                    target = method;
+                    break;
+                }
+            }
+            if (target == null) {
+                return RequestBody.create(MediaType.parse("json"), "{}");
+            }
+            Object output = target.invoke(input.getConstructor().newInstance(), args);
             if (output instanceof RequestBody)
                 return (RequestBody) output;
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
+            e.printStackTrace();
+        }
+        return RequestBody.create(MediaType.parse("json"), "{}");
+    }
+
+    private static Object parseCustomRequestBody(Class<?> input, String function, Response<ResponseBody> response) {
+        Method method;
+        try {
+            method = input.getMethod(function + "_response", Response.class);
+            return method.invoke(null, response);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -225,35 +248,32 @@ public abstract class Chayi {
      * it should have method with that function name
      * that return RequestBody type for post request
      */
-    public void customPostRequest(SingleChayiCallBack callBack, String function, Class<?> input, boolean token) {
+    public static void customPostRequest(SingleChayiCallBack callBack, String function, Class<?> input,
+                                         boolean token, String... args) {
         String url = getAllUrl(input) + "/" + function;
+        RequestBody body = getCustomRequestBody(input, function, args);
+
         ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 
         Call<ResponseBody> repos;
         if (token)
-            repos = chayiInterface.post(url, getCustomRequestBody(input, function), Constants.getToken());
+            repos = chayiInterface.post(url, body, Constants.getToken());
         else
-            repos = chayiInterface.post(url, getCustomRequestBody(input, function));
+            repos = chayiInterface.post(url, body);
 
         repos.enqueue(new Callback<ResponseBody>() {
             @Override
+            @EverythingIsNonNull
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                JSONObject responseObject = null;
-                try {
-                    responseObject = new JSONObject(response.body().string());
-                } catch (JSONException | IOException e) {
-                    e.printStackTrace();
-                }
-                if (handleResponse(response, responseObject)) {
-                    Log.i(TAG, "onResponse: body =" + response.body());
-                    callBack.onResponse(null);
+                if (response.code() > 100 && response.code() < 400) {
+                    callBack.onResponse((Chayi) parseCustomRequestBody(input, function, response));
                 } else {
                     callBack.fail("");
                 }
-
             }
 
             @Override
+            @EverythingIsNonNull
             public void onFailure(Call<ResponseBody> call, Throwable t) {
 
             }
@@ -273,6 +293,7 @@ public abstract class Chayi {
 
         repos.enqueue(new Callback<ResponseBody>() {
             @Override
+            @EverythingIsNonNull
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 JSONObject responseObject = null;
                 try {
@@ -289,6 +310,7 @@ public abstract class Chayi {
             }
 
             @Override
+            @EverythingIsNonNull
             public void onFailure(Call<ResponseBody> call, Throwable t) {
 
             }
@@ -310,6 +332,7 @@ public abstract class Chayi {
 
         repos.enqueue(new Callback<ResponseBody>() {
             @Override
+            @EverythingIsNonNull
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 JSONObject responseObject = null;
                 try {
@@ -326,6 +349,7 @@ public abstract class Chayi {
             }
 
             @Override
+            @EverythingIsNonNull
             public void onFailure(Call<ResponseBody> call, Throwable t) {
 
             }
@@ -346,6 +370,7 @@ public abstract class Chayi {
 
         repos.enqueue(new Callback<ResponseBody>() {
             @Override
+            @EverythingIsNonNull
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 try {
                     JSONObject responseObject = new JSONObject(response.body().string());
@@ -364,6 +389,7 @@ public abstract class Chayi {
             }
 
             @Override
+            @EverythingIsNonNull
             public void onFailure(Call<ResponseBody> call, Throwable t) {
 
             }
@@ -383,6 +409,7 @@ public abstract class Chayi {
 
         repos.enqueue(new Callback<ResponseBody>() {
             @Override
+            @EverythingIsNonNull
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 try {
                     JSONObject responseObject = new JSONObject(response.body().string());
@@ -398,6 +425,7 @@ public abstract class Chayi {
             }
 
             @Override
+            @EverythingIsNonNull
             public void onFailure(Call<ResponseBody> call, Throwable t) {
 
             }
