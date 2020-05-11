@@ -15,9 +15,6 @@ public interface ChayiInterface {
 
 
     @GET
-    Call<ResponseBody> get(@Url String url);
-
-    @GET
     Call<ResponseBody> get(@Url String url, @Header("Authorization") String token);
 
     @POST
@@ -29,13 +26,8 @@ public interface ChayiInterface {
     @PUT
     Call<ResponseBody> put(@Url String url, @Body RequestBody body, @Header("Authorization") String token);
 
-    @PUT
-    Call<ResponseBody> put(@Url String url, @Body RequestBody body);
-
     @DELETE
     Call<ResponseBody> delete(@Url String url, @Header("Authorization") String token);
 
-    @DELETE
-    Call<ResponseBody> delete(@Url String url);
 
 }

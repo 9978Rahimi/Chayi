@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
                 public void fail(String errorMassage) {
 
                 }
-            }, "app_enter", Citizen.class, false, "09384142925");
+            }, "app_enter", Citizen.class, "09384142925");
         });
     }
 

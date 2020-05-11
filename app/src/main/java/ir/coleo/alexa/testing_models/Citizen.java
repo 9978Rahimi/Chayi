@@ -5,7 +5,6 @@ import android.util.Log;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,6 +18,9 @@ import okhttp3.ResponseBody;
 import retrofit2.Response;
 
 public class Citizen extends Chayi {
+
+    public static final boolean app_enter_token = false;
+    public static final boolean app_check_code_token = false;
 
     public static String getSingleName() {
         return "citizen";
