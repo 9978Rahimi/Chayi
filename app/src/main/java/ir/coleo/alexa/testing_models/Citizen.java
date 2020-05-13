@@ -39,6 +39,22 @@ public class Citizen extends Chayi {
         return RequestBody.create(MediaType.parse("json"), object.toString());
     }
 
+    public static RequestBody create_request(User user, String firebase_token) {
+        JsonObject object = new JsonObject();
+        object.add("firebase_token", new JsonPrimitive(firebase_token));
+
+        if (user == null) {
+            object.add("user", null);
+        } else {
+            JsonObject userObject = new JsonObject();
+            userObject.add("id", new JsonPrimitive(user.getId()));
+            object.add("user", userObject);
+        }
+        Log.i("TAG", "create_request: " + object.toString());
+        return RequestBody.create(MediaType.parse("json"), object.toString());
+    }
+
+
     public static void app_enter_response(Response<ResponseBody> response) {
         //
         Log.i("CITIZEN", "app_enter_parser: ");
