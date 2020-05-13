@@ -34,7 +34,15 @@ public class MainActivity extends AppCompatActivity {
 
         button.setOnClickListener(view -> putName());
         code.setOnClickListener(v -> {
-            Log.i(TAG, "onCreate: " + Citizen.create_request(null,"sadsadsad").toString());
+            Chayi.customPostRequest(new SingleChayiCallBack() {
+                @Override
+                public void onResponse(Chayi chayi) {
+                }
+
+                @Override
+                public void fail(String errorMassage) {
+                }
+            }, "app_enter", Citizen.class, "09384142925");
         });
     }
 
