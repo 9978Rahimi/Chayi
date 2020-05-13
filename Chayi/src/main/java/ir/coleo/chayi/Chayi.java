@@ -205,7 +205,6 @@ public abstract class Chayi {
         return RequestBody.create(MediaType.parse("json"), object.toString());
     }
 
-
     private static RequestBody getCustomRequestBody(Class<?> input, String function, Object... args) {
         Method[] methods;
         Method target = null;
@@ -456,4 +455,7 @@ public abstract class Chayi {
         int code;
     }
 
+    public int getId() {
+        return id;
+    }
 }
