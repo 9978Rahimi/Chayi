@@ -219,10 +219,10 @@ public abstract class Chayi {
             if (target == null) {
                 return RequestBody.create(MediaType.parse("json"), "{}");
             }
-            Object output = target.invoke(input.getConstructor().newInstance(), args);
+            Object output = target.invoke(null, args);
             if (output instanceof RequestBody)
                 return (RequestBody) output;
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return RequestBody.create(MediaType.parse("json"), "{}");

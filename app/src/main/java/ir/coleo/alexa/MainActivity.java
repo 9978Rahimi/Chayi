@@ -7,6 +7,7 @@ import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
 
 import ir.coleo.alexa.testing_models.Citizen;
+import ir.coleo.alexa.testing_models.CitizenAppVersion;
 import ir.coleo.chayi.Chayi;
 import ir.coleo.chayi.callBack.SingleChayiCallBack;
 import ir.coleo.chayi.constats.Constants;
@@ -33,15 +34,31 @@ public class MainActivity extends AppCompatActivity {
         code.setOnClickListener(v -> {
             Chayi.customPostRequest(new SingleChayiCallBack() {
                 @Override
-                public void onResponse(Chayi chayi) {
+                public void onResponse(Chayi livan) {
+                    Chayi.customPostRequest(new SingleChayiCallBack() {
+                        @Override
+                        public void onResponse(Chayi chayi) {
 
+                        }
+
+                        @Override
+                        public void fail(String errorMassage) {
+
+                        }
+                    }, "set_app_version", Citizen.class, livan.getId());
+                    if (livan instanceof CitizenAppVersion) {
+                        if (((CitizenAppVersion) livan).getForceUpdate()) {
+                        } else if (((CitizenAppVersion) livan).getAvailableUpdate()) {
+                        } else {
+                        }
+                    }
                 }
 
                 @Override
                 public void fail(String errorMassage) {
 
                 }
-            }, "app_enter", Citizen.class, "09384142925");
+            }, "version_code_find", CitizenAppVersion.class, 10);
         });
     }
 
