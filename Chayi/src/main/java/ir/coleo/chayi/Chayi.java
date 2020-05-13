@@ -3,6 +3,7 @@ package ir.coleo.chayi;
 import android.app.Activity;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.annotations.Expose;
 
@@ -23,6 +24,7 @@ import ir.coleo.chayi.callBack.SingleChayiCallBack;
 import ir.coleo.chayi.constats.ChayiInterface;
 import ir.coleo.chayi.constats.Constants;
 import ir.coleo.chayi.constats.RetrofitSingleTone;
+import ir.hatamiarash.toast.RTLToast;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -75,23 +77,19 @@ public abstract class Chayi {
             @Override
             @EverythingIsNonNull
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                try {
-                    JSONObject responseObject = new JSONObject(response.body().string());
-                    if (handleResponse(response, responseObject)) {
-                        ArrayList<Chayi> chayis = Chayi.AllResponseParser(input, responseObject);
-                        for (Chayi temp : chayis) {
-                            Log.i(TAG, "onResponse: " + temp.toString());
-                        }
-                        chayiCallBack.onResponse(chayis);
-                    } else {
-                        chayiCallBack.fail("");
-                        //todo
-
+                ChayiResponse chayiResponse = handleResponse(response);
+                if (chayiResponse.ok) {
+                    ArrayList<Chayi> chayis = Chayi.AllResponseParser(input, chayiResponse.response);
+                    for (Chayi temp : chayis) {
+                        Log.i(TAG, "onResponse: " + temp.toString());
                     }
+                    chayiCallBack.onResponse(chayis);
+                } else {
+                    chayiCallBack.fail("");
+                    //todo
 
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
                 }
+
             }
 
             @Override
@@ -133,25 +131,28 @@ public abstract class Chayi {
         return (Chayi) RetrofitSingleTone.getInstance().getGson().fromJson(response, input);
     }
 
-    private static boolean handleResponse(Response<ResponseBody> response, JSONObject object) {
+    private static ChayiResponse handleResponse(Response<ResponseBody> response) {
         if (response.code() >= 100 && response.code() < 400) {
             if (response.body() != null) {
+                JSONObject responseObject = null;
                 try {
-                    Constants.setToken(object.getString("token"));
-                } catch (JSONException e) {
+                    responseObject = new JSONObject(response.body().string());
+                    Constants.setToken(responseObject.getString("token"));
+                    return new ChayiResponse(true, responseObject);
+                } catch (JSONException | IOException e) {
                     e.printStackTrace();
                 }
             }
-            return true;
+            return new ChayiResponse(true, null);
         } else {
-            Log.i(TAG, "handleResponse: more than 400");
+            RTLToast.error(Constants.context, parseError(response), Toast.LENGTH_LONG).show();
             if (response.code() == 403 && firstErrorCode(response) == 12) {
                 Constants.setToken(Constants.NO_TOKEN);
                 Intent intent = new Intent(Constants.context, Constants.getRestartActivity());
                 Constants.context.startActivity(intent);
                 ((Activity) Constants.context).finish();
             }
-            return false;
+            return new ChayiResponse(false, null);
         }
     }
 
@@ -315,14 +316,9 @@ public abstract class Chayi {
             @Override
             @EverythingIsNonNull
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                JSONObject responseObject = null;
-                try {
-                    responseObject = new JSONObject(response.body().string());
-                } catch (JSONException | IOException e) {
-                    e.printStackTrace();
-                }
-                if (handleResponse(response, responseObject)) {
-                    callBack.onResponse((Chayi) responseParserPutOrPost(input, responseObject));
+                ChayiResponse chayiResponse = handleResponse(response);
+                if (chayiResponse.ok) {
+                    callBack.onResponse((Chayi) responseParserPutOrPost(input, chayiResponse.response));
                 } else {
                     callBack.fail("");
                 }
@@ -388,14 +384,9 @@ public abstract class Chayi {
             @Override
             @EverythingIsNonNull
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                JSONObject responseObject = null;
-                try {
-                    responseObject = new JSONObject(response.body().string());
-                } catch (JSONException | IOException e) {
-                    e.printStackTrace();
-                }
-                if (handleResponse(response, responseObject)) {
-                    callBack.onResponse(responseParserPutOrPost(input, responseObject));
+                ChayiResponse chayiResponse = handleResponse(response);
+                if (chayiResponse.ok) {
+                    callBack.onResponse(responseParserPutOrPost(input, chayiResponse.response));
                 } else {
                     callBack.fail("");
                 }
@@ -421,14 +412,9 @@ public abstract class Chayi {
             @Override
             @EverythingIsNonNull
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                JSONObject responseObject = null;
-                try {
-                    responseObject = new JSONObject(response.body().string());
-                } catch (JSONException | IOException e) {
-                    e.printStackTrace();
-                }
-                if (handleResponse(response, responseObject)) {
-                    callBack.onResponse(responseParserPutOrPost(input, responseObject));
+                ChayiResponse chayiResponse = handleResponse(response);
+                if (chayiResponse.ok) {
+                    callBack.onResponse(responseParserPutOrPost(input, chayiResponse.response));
                 } else {
                     callBack.fail("");
                 }
@@ -456,17 +442,17 @@ public abstract class Chayi {
             @EverythingIsNonNull
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 try {
-                    JSONObject responseObject = new JSONObject(response.body().string());
-                    if (handleResponse(response, responseObject)) {
+                    ChayiResponse chayiResponse = handleResponse(response);
+                    if (chayiResponse.ok) {
                         Chayi newObject = RetrofitSingleTone.getInstance().getGson()
-                                .fromJson(responseObject.getJSONObject(Objects.requireNonNull(getObjectName(input))).toString(), Chayi.this.getClass());
+                                .fromJson(chayiResponse.response.getJSONObject(Objects.requireNonNull(getObjectName(input))).toString(), Chayi.this.getClass());
 
                         callBack.onResponse(newObject);
                     } else {
                         callBack.fail("");//todo
                     }
 
-                } catch (IOException | JSONException e) {
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
@@ -490,17 +476,15 @@ public abstract class Chayi {
             @Override
             @EverythingIsNonNull
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                try {
-                    JSONObject responseObject = new JSONObject(response.body().string());
-                    if (handleResponse(response, responseObject)) {
-                        callBack.onResponse(null);
-                    } else {
-                        callBack.fail("");//todo
-                    }
 
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
+                ChayiResponse chayiResponse = handleResponse(response);
+                if (chayiResponse.ok) {
+                    callBack.onResponse(null);
+                } else {
+                    callBack.fail("");//todo
                 }
+
+
             }
 
             @Override
@@ -539,6 +523,16 @@ public abstract class Chayi {
         String body;
         String title;
         int code;
+    }
+
+    static class ChayiResponse {
+        boolean ok;
+        JSONObject response;
+
+        public ChayiResponse(boolean ok, JSONObject response) {
+            this.ok = ok;
+            this.response = response;
+        }
     }
 
     public int getId() {
