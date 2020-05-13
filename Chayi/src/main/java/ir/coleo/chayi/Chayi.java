@@ -250,15 +250,67 @@ public abstract class Chayi {
         return false;
     }
 
-    /**
-     * @param function name of api function
-     * @apiNote target class that you are calling function on
-     * it should have method with that function name
-     * that return RequestBody type for post request
-     */
+    private static boolean isOnItem(Class<?> input, String function) {
+        try {
+            Field field;
+            field = input.getField(function + "_on_item");
+            return field.getBoolean(null);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static void customPostRequest(SingleChayiCallBack callBack, String function, Object inputObject,
+                                         Object... args) {
+        Class<?> input = inputObject.getClass();
+        boolean onItem = isOnItem(input, function);
+        String url;
+        if (onItem) {
+            if (inputObject instanceof Chayi) {
+                url = getAllUrl(input) + "/" + ((Chayi) inputObject).getId() + "/" + function;
+            } else {
+                url = getAllUrl(input) + "/" + function;
+            }
+        } else {
+            url = getAllUrl(input) + "/" + function;
+        }
+
+        boolean token = needToken(input, function);
+        RequestBody body = getCustomRequestBody(input, function, args);
+
+        ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
+
+        Call<ResponseBody> repos;
+        if (token)
+            repos = chayiInterface.post(url, body, Constants.getToken());
+        else
+            repos = chayiInterface.post(url, body);
+
+        repos.enqueue(new Callback<ResponseBody>() {
+            @Override
+            @EverythingIsNonNull
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.code() > 100 && response.code() < 400) {
+                    callBack.onResponse((Chayi) parseCustomRequestBody(input, function, response));
+                } else {
+                    callBack.fail("");
+                }
+            }
+
+            @Override
+            @EverythingIsNonNull
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+
     public static void customPostRequest(SingleChayiCallBack callBack, String function, Class<?> input,
                                          Object... args) {
+        boolean onItem = needToken(input, function);
         String url = getAllUrl(input) + "/" + function;
+
         boolean token = needToken(input, function);
         RequestBody body = getCustomRequestBody(input, function, args);
 
