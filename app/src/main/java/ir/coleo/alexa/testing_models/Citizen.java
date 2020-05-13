@@ -2,13 +2,16 @@ package ir.coleo.alexa.testing_models;
 
 import android.util.Log;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import ir.coleo.chayi.Chayi;
 import ir.coleo.chayi.constats.RetrofitSingleTone;
@@ -44,7 +47,23 @@ public class Citizen extends Chayi {
     public static Citizen app_check_code_response(Response<ResponseBody> response) {
         try {
             JSONObject responseObject = new JSONObject(response.body().string());
+            int tempInt = responseObject.getInt("fucking_int");
+            String tempS = responseObject.getString("fucking_int");
+            boolean tempbol = responseObject.getBoolean("fucking_int");
+            //can return int
+            //public static int
+
+            //
+            JSONArray array = responseObject.getJSONArray("array_name");
+            ArrayList<Citizen> citizens = new ArrayList<>();
+            for (int i = 0; i < array.length(); i++) {
+                JsonObject object = (JsonObject) array.get(i);
+                citizens.add(RetrofitSingleTone.getInstance().getGson().fromJson(object, Citizen.class));
+            }
+
             return RetrofitSingleTone.getInstance().getGson().fromJson(responseObject.get("citizen").toString(), Citizen.class);
+            //can return citizens
+            //public static ArrayList<Citizen> ...
         } catch (JSONException | IOException e) {
             e.printStackTrace();
         }

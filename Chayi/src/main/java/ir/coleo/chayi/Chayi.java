@@ -64,7 +64,7 @@ public abstract class Chayi {
         return null;
     }
 
-    public static void getAllRequest(Class<?> input, ChayiCallBack chayiCallBack, boolean token) {
+    public static void getAllRequest(Class<?> input, ChayiCallBack chayiCallBack) {
         String url = getAllUrl(input);
         ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 
@@ -206,7 +206,7 @@ public abstract class Chayi {
     }
 
 
-    private static RequestBody getCustomRequestBody(Class<?> input, String function, String... args) {
+    private static RequestBody getCustomRequestBody(Class<?> input, String function, Object... args) {
         Method[] methods;
         Method target = null;
         try {
@@ -258,7 +258,7 @@ public abstract class Chayi {
      * that return RequestBody type for post request
      */
     public static void customPostRequest(SingleChayiCallBack callBack, String function, Class<?> input,
-                                         String... args) {
+                                         Object... args) {
         String url = getAllUrl(input) + "/" + function;
         boolean token = needToken(input, function);
         RequestBody body = getCustomRequestBody(input, function, args);
