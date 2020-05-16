@@ -5,6 +5,7 @@ import android.util.Log;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.annotations.Expose;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,6 +25,11 @@ public class Citizen extends Chayi {
 
     public static final boolean app_enter_token = false;
     public static final boolean app_check_code_token = false;
+
+    @Expose
+    protected User user = new User();
+    @Expose
+    protected String asd = null;
 
     public static String getSingleName() {
         return "citizen";

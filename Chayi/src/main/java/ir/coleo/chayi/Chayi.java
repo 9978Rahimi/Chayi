@@ -174,15 +174,32 @@ public abstract class Chayi {
         return getAllUrl(input) + "/" + id;
     }
 
-    public RequestBody getJsonObject(Class<?> input) {
+    public JSONObject getPutJsonObject(Object input, boolean inner) {
         JSONObject object = new JSONObject();
         try {
-            object.put(getObjectName(input), new JSONObject(RetrofitSingleTone.getInstance().getGson().toJson(this)));
-        } catch (JSONException e) {
+            JSONObject output = new JSONObject();
+            for (Field field : input.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                if (field.isAnnotationPresent(Expose.class))
+                    if (field.getType().isPrimitive()) {
+                        output.put(field.getName(), field.get(input));
+                    } else if (field.getType().isInstance("")) {
+                        output.put(field.getName(), field.get(input));
+                    } else if (!field.getType().isInstance(List.class)) {
+                        output.put(field.getName(), getPutJsonObject(Objects.requireNonNull(field.get(input)), true));
+                    }
+            }
+            if (inner) {
+                return output;
+            } else {
+                object.put(Objects.requireNonNull(getObjectName(input.getClass())), output);
+            }
+        } catch (JSONException | IllegalAccessException e) {
             e.printStackTrace();
         }
-        return RequestBody.create(MediaType.parse("json"), object.toString());
+        return object;
     }
+
 
     public static RequestBody getCreateJsonObject(Class<?> input, Object... args) {
         Method[] methods;
@@ -440,7 +457,9 @@ public abstract class Chayi {
         String url = getUrl(input);
         ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 
-        Call<ResponseBody> repos = chayiInterface.put(url, getJsonObject(input), Constants.getToken());
+        String jsonString = getPutJsonObject(Objects.requireNonNull(input.cast(this)), false).toString();
+        RequestBody body = RequestBody.create(MediaType.parse("json"), jsonString);
+        Call<ResponseBody> repos = chayiInterface.put(url, body, Constants.getToken());
 
 
         repos.enqueue(new Callback<ResponseBody>() {

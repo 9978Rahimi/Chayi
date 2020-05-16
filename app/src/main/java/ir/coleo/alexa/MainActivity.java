@@ -1,15 +1,12 @@
 package ir.coleo.alexa;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import ir.coleo.alexa.testing_models.Citizen;
-import ir.coleo.alexa.testing_models.CitizenAppVersion;
-import ir.coleo.alexa.testing_models.User;
 import ir.coleo.chayi.Chayi;
 import ir.coleo.chayi.callBack.SingleChayiCallBack;
 import ir.coleo.chayi.constats.Constants;
@@ -34,15 +31,18 @@ public class MainActivity extends AppCompatActivity {
 
         button.setOnClickListener(view -> putName());
         code.setOnClickListener(v -> {
-            Chayi.customPostRequest(new SingleChayiCallBack() {
+            Citizen citizen = new Citizen();
+            citizen.putRequest(new SingleChayiCallBack() {
                 @Override
                 public void onResponse(Chayi chayi) {
+
                 }
 
                 @Override
                 public void fail(String errorMassage) {
+
                 }
-            }, "app_enter", Citizen.class, "09384142925");
+            }, Citizen.class);
         });
     }
 
