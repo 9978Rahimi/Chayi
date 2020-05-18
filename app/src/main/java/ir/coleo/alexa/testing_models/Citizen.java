@@ -2,7 +2,6 @@ package ir.coleo.alexa.testing_models;
 
 import android.util.Log;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.annotations.Expose;
@@ -29,7 +28,16 @@ public class Citizen extends Chayi {
     @Expose
     protected User user = new User();
     @Expose
-    protected String asd = null;
+    protected String asd = "mmd";
+    @Expose
+    ArrayList<User> users;
+
+    {
+        users = new ArrayList<>();
+        users.add(new User());
+        users.add(new User());
+        users.add(new User());
+    }
 
     public static String getSingleName() {
         return "citizen";

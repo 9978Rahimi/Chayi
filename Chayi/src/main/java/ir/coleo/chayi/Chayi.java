@@ -158,11 +158,13 @@ public abstract class Chayi {
             }
             if (error != null) {
                 RTLToast.error(Constants.context, error.getErrors(), Toast.LENGTH_LONG).show();
-                if (response.code() == 403 && error.messages.error.get(0).code == 12) {
-                    Constants.setToken(Constants.NO_TOKEN);
-                    Intent intent = new Intent(Constants.context, Constants.getRestartActivity());
-                    Constants.context.startActivity(intent);
-                    ((Activity) Constants.context).finish();
+                if (response.code() == 403) {
+                    if (!haveToken()) {
+                        Constants.setToken("Token " + Constants.NO_TOKEN);
+                        Intent intent = new Intent(Constants.context, Constants.getRestartActivity());
+                        Constants.context.startActivity(intent);
+                        ((Activity) Constants.context).finish();
+                    }
                 }
             }
 
@@ -172,6 +174,54 @@ public abstract class Chayi {
 
     public String getUrl(Class<?> input) {
         return getAllUrl(input) + "/" + id;
+    }
+
+    public static JSONObject getOnlyId(Object input) {
+        JSONObject output = new JSONObject();
+        try {
+            for (Field field : input.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                if (field.isAnnotationPresent(Expose.class))
+                    if (field.getType().isPrimitive()) {
+                        output.put(field.getName(), field.get(input));
+                    } else if (field.getType().isInstance("")) {
+                        output.put(field.getName(), field.get(input));
+                    } else if (!field.getType().equals(ArrayList.class)) {
+                        if (field.get(input) != null) {
+                            JSONObject innerObject = new JSONObject();
+                            try {
+                                Object target = field.get(input);
+                                int id = (int) target.getClass().getDeclaredField("id").get(target);
+                                innerObject.put("id", id);
+                                output.put(field.getName(), innerObject);
+                            } catch (NoSuchFieldException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    } else {
+                        JSONArray array = new JSONArray();
+                        Object value = field.get(input);
+                        List<Objects> list = (List<Objects>) value;
+                        for (Object temp : list) {
+                            if (temp.getClass().isPrimitive() || temp.getClass().isInstance(""))
+                                continue;
+                            JSONObject innerObject = new JSONObject();
+                            try {
+                                int id = (int) temp.getClass().getDeclaredField("id").get(temp);
+                                innerObject.put("id", id);
+                                array.put(innerObject);
+                            } catch (NoSuchFieldException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        output.put(field.getName(), array);
+                    }
+            }
+
+        } catch (JSONException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return output;
     }
 
     public JSONObject getPutJsonObject(Object input, boolean inner) {
@@ -186,7 +236,20 @@ public abstract class Chayi {
                     } else if (field.getType().isInstance("")) {
                         output.put(field.getName(), field.get(input));
                     } else if (!field.getType().isInstance(List.class)) {
-                        output.put(field.getName(), getPutJsonObject(Objects.requireNonNull(field.get(input)), true));
+                        if (field.get(input) != null)
+                            output.put(field.getName(), getPutJsonObject(field.get(input), true));
+                    }
+            }
+            for (Field field : input.getClass().getSuperclass().getDeclaredFields()) {
+                field.setAccessible(true);
+                if (field.isAnnotationPresent(Expose.class))
+                    if (field.getType().isPrimitive()) {
+                        output.put(field.getName(), field.get(input));
+                    } else if (field.getType().isInstance("")) {
+                        output.put(field.getName(), field.get(input));
+                    } else if (!field.getType().isInstance(List.class)) {
+                        if (field.get(input) != null)
+                            output.put(field.getName(), getPutJsonObject(field.get(input), true));
                     }
             }
             if (inner) {
@@ -458,6 +521,7 @@ public abstract class Chayi {
         ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 
         String jsonString = getPutJsonObject(Objects.requireNonNull(input.cast(this)), false).toString();
+        Log.i(TAG, "putRequest: " + jsonString);
         RequestBody body = RequestBody.create(MediaType.parse("json"), jsonString);
         Call<ResponseBody> repos = chayiInterface.put(url, body, Constants.getToken());
 
