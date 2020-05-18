@@ -157,14 +157,17 @@ public abstract class Chayi {
                 }
             }
             if (error != null) {
-                RTLToast.error(Constants.context, error.getErrors(), Toast.LENGTH_LONG).show();
                 if (response.code() == 403) {
-                    if (!haveToken()) {
-                        Constants.setToken("Token " + Constants.NO_TOKEN);
+                    if (haveToken()) {
+                        RTLToast.error(Constants.context, error.getErrors(), Toast.LENGTH_LONG).show();
+                        Constants.setToken(Constants.NO_TOKEN);
                         Intent intent = new Intent(Constants.context, Constants.getRestartActivity());
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         Constants.context.startActivity(intent);
                         ((Activity) Constants.context).finish();
                     }
+                } else {
+                    RTLToast.error(Constants.context, error.getErrors(), Toast.LENGTH_LONG).show();
                 }
             }
 
