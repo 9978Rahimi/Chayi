@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.Expose;
 
 import org.json.JSONArray;
@@ -21,6 +22,7 @@ import java.util.Objects;
 
 import ir.coleo.chayi.callBack.ChayiCallBack;
 import ir.coleo.chayi.callBack.SingleChayiCallBack;
+import ir.coleo.chayi.callBack.SingleStatusChayiCallBack;
 import ir.coleo.chayi.constats.ChayiInterface;
 import ir.coleo.chayi.constats.Constants;
 import ir.coleo.chayi.constats.RetrofitSingleTone;
@@ -152,7 +154,7 @@ public abstract class Chayi {
                             .getInstance()
                             .getGson()
                             .fromJson(response.errorBody().string(), Error.class);
-                } catch (IOException e) {
+                } catch (IOException | JsonSyntaxException e) {
                     e.printStackTrace();
                 }
             }
@@ -379,7 +381,10 @@ public abstract class Chayi {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 ChayiResponse chayiResponse = handleResponse(response);
                 if (chayiResponse.ok) {
-                    callBack.onResponse(responseParserPutOrPost(input, chayiResponse.response));
+                    if (callBack instanceof SingleStatusChayiCallBack) {
+                        ((SingleStatusChayiCallBack) callBack).onResponse(responseParserPutOrPost(input, chayiResponse.response), response.code());
+                    } else if (callBack != null)
+                        callBack.onResponse(responseParserPutOrPost(input, chayiResponse.response));
                 } else {
                     callBack.fail("");
                 }
@@ -505,7 +510,10 @@ public abstract class Chayi {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 ChayiResponse chayiResponse = handleResponse(response);
                 if (chayiResponse.ok) {
-                    callBack.onResponse(responseParserPutOrPost(input, chayiResponse.response));
+                    if (callBack instanceof SingleStatusChayiCallBack) {
+                        ((SingleStatusChayiCallBack) callBack).onResponse(responseParserPutOrPost(input, chayiResponse.response), response.code());
+                    } else if (callBack != null)
+                        callBack.onResponse(responseParserPutOrPost(input, chayiResponse.response));
                 } else {
                     callBack.fail("");
                 }

@@ -13,12 +13,12 @@ import retrofit2.http.Url;
 
 public interface ChayiInterface {
 
+    @POST
+    Call<ResponseBody> post(@Url String url, @Body RequestBody chayi, @Header("Authorization") String token);
+
 
     @GET
     Call<ResponseBody> get(@Url String url, @Header("Authorization") String token);
-
-    @POST
-    Call<ResponseBody> post(@Url String url, @Body RequestBody chayi, @Header("Authorization") String token);
 
     @POST
     Call<ResponseBody> post(@Url String url, @Body RequestBody chayi);
