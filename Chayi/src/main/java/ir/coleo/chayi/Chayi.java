@@ -27,6 +27,8 @@ import ir.coleo.chayi.callBack.SingleStatusChayiCallBack;
 import ir.coleo.chayi.constats.ChayiInterface;
 import ir.coleo.chayi.constats.Constants;
 import ir.coleo.chayi.constats.RetrofitSingleTone;
+import ir.coleo.chayi.responseUtil.ChayiResponse;
+import ir.coleo.chayi.responseUtil.Error;
 import ir.hatamiarash.toast.RTLToast;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -89,8 +91,8 @@ public abstract class Chayi {
             @EverythingIsNonNull
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 ChayiResponse chayiResponse = handleResponse(response);
-                if (chayiResponse.ok) {
-                    ArrayList<T> chayis = Chayi.AllResponseParser(input, chayiResponse.response);
+                if (chayiResponse.isOk()) {
+                    ArrayList<T> chayis = Chayi.AllResponseParser(input, chayiResponse.getResponse());
                     chayiCallBack.onResponse(chayis);
                 } else {
                     chayiCallBack.fail("");
@@ -256,7 +258,6 @@ public abstract class Chayi {
         return array;
     }
 
-
     public JSONObject getPutJsonObject(Object input, boolean inner) {
         JSONObject object = new JSONObject();
         try {
@@ -300,7 +301,6 @@ public abstract class Chayi {
         return object;
     }
 
-
     public static <T> RequestBody getCreateJsonObject(Class<T> input, Object... args) {
         Method[] methods;
         Method target = null;
@@ -308,31 +308,6 @@ public abstract class Chayi {
             methods = input.getMethods();
             for (Method method : methods) {
                 if (method.getName().equals("create_request")) {
-                    target = method;
-                    break;
-                }
-            }
-            if (target == null) {
-                return RequestBody.create(MediaType.parse("json"), "{}");
-            }
-            Object output = target.invoke(null, args);
-            if (output instanceof RequestBody)
-                return (RequestBody) output;
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return RequestBody.create(MediaType.parse("json"), "{}");
-    }
-
-    private static <T> RequestBody getCustomRequestBody(Class<T> input, String function, Object... args) {
-        Method[] methods;
-        Method target = null;
-        try {
-            methods = input.getMethods();
-            for (Method method : methods) {
-                if (method.getName().equals(function + "_request")) {
                     target = method;
                     break;
                 }
@@ -377,6 +352,31 @@ public abstract class Chayi {
         return false;
     }
 
+    private static <T> RequestBody getCustomRequestBody(Class<T> input, String function, Object... args) {
+        Method[] methods;
+        Method target = null;
+        try {
+            methods = input.getMethods();
+            for (Method method : methods) {
+                if (method.getName().equals(function + "_request")) {
+                    target = method;
+                    break;
+                }
+            }
+            if (target == null) {
+                return RequestBody.create(MediaType.parse("json"), "{}");
+            }
+            Object output = target.invoke(null, args);
+            if (output instanceof RequestBody)
+                return (RequestBody) output;
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return RequestBody.create(MediaType.parse("json"), "{}");
+    }
+
     public static <T extends Chayi> void customPostRequest(SingleChayiCallBack<? extends Chayi> callBack, String function, T inputObject,
                                                            Object... args) {
         Class<?> input = inputObject.getClass();
@@ -405,11 +405,11 @@ public abstract class Chayi {
             @EverythingIsNonNull
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 ChayiResponse chayiResponse = handleResponse(response);
-                if (chayiResponse.ok) {
+                if (chayiResponse.isOk()) {
                     if (callBack instanceof SingleStatusChayiCallBack) {
-                        ((SingleStatusChayiCallBack<?>) callBack).onResponse(responseParserPutOrPost(input, chayiResponse.response), response.code());
+                        ((SingleStatusChayiCallBack<?>) callBack).onResponse(responseParserPutOrPost(input, chayiResponse.getResponse()), response.code());
                     } else if (callBack != null)
-                        callBack.onResponse(responseParserPutOrPost(input, chayiResponse.response));
+                        callBack.onResponse(responseParserPutOrPost(input, chayiResponse.getResponse()));
                 } else {
                     callBack.fail("");
                 }
@@ -452,8 +452,8 @@ public abstract class Chayi {
             @EverythingIsNonNull
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 ChayiResponse chayiResponse = handleResponse(response);
-                if (chayiResponse.ok) {
-                    ArrayList<T> chayis = Chayi.AllResponseParser(input, chayiResponse.response);
+                if (chayiResponse.isOk()) {
+                    ArrayList<T> chayis = Chayi.AllResponseParser(input, chayiResponse.getResponse());
                     callBack.onResponse(chayis);
                 } else {
                     callBack.fail("");
@@ -489,8 +489,8 @@ public abstract class Chayi {
             @EverythingIsNonNull
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 ChayiResponse chayiResponse = handleResponse(response);
-                if (chayiResponse.ok) {
-                    ArrayList<T> chayis = Chayi.AllResponseParser(input, chayiResponse.response);
+                if (chayiResponse.isOk()) {
+                    ArrayList<T> chayis = Chayi.AllResponseParser(input, chayiResponse.getResponse());
                     callBack.onResponse(chayis);
                 } else {
                     callBack.fail("");
@@ -526,11 +526,11 @@ public abstract class Chayi {
             @EverythingIsNonNull
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 ChayiResponse chayiResponse = handleResponse(response);
-                if (chayiResponse.ok) {
+                if (chayiResponse.isOk()) {
                     if (callBack instanceof SingleStatusChayiCallBack) {
-                        ((SingleStatusChayiCallBack<T>) callBack).onResponse(responseParserPutOrPost(input, chayiResponse.response), response.code());
+                        ((SingleStatusChayiCallBack<T>) callBack).onResponse(responseParserPutOrPost(input, chayiResponse.getResponse()), response.code());
                     } else if (callBack != null)
-                        callBack.onResponse(responseParserPutOrPost(input, chayiResponse.response));
+                        callBack.onResponse(responseParserPutOrPost(input, chayiResponse.getResponse()));
                 } else {
                     callBack.fail("");
                 }
@@ -542,6 +542,34 @@ public abstract class Chayi {
 
             }
         });
+    }
+
+    public static <T extends Chayi> void postRequest(SingleChayiCallBack<T> callBack, Class<?> input, Object... args) {
+        String url = getAllUrl(input);
+        ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
+
+        Call<ResponseBody> repos = chayiInterface.post(url, getCreateJsonObject(input, args), Constants.getToken());
+
+        repos.enqueue(new Callback<ResponseBody>() {
+            @Override
+            @EverythingIsNonNull
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                ChayiResponse chayiResponse = handleResponse(response);
+                if (chayiResponse.isOk()) {
+                    callBack.onResponse(responseParserPutOrPost(input, chayiResponse.getResponse()));
+                } else {
+                    callBack.fail("");
+                }
+
+            }
+
+            @Override
+            @EverythingIsNonNull
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+
     }
 
     public <T extends Chayi> void putRequest(SingleChayiCallBack<T> callBack, Class<?> input) {
@@ -558,36 +586,8 @@ public abstract class Chayi {
             @EverythingIsNonNull
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 ChayiResponse chayiResponse = handleResponse(response);
-                if (chayiResponse.ok) {
-                    callBack.onResponse(responseParserPutOrPost(input, chayiResponse.response));
-                } else {
-                    callBack.fail("");
-                }
-
-            }
-
-            @Override
-            @EverythingIsNonNull
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-            }
-        });
-
-    }
-
-    public static <T extends Chayi> void postRequest(SingleChayiCallBack<T> callBack, Class<?> input, Object... args) {
-        String url = getAllUrl(input);
-        ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
-
-        Call<ResponseBody> repos = chayiInterface.post(url, getCreateJsonObject(input, args), Constants.getToken());
-
-        repos.enqueue(new Callback<ResponseBody>() {
-            @Override
-            @EverythingIsNonNull
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                ChayiResponse chayiResponse = handleResponse(response);
-                if (chayiResponse.ok) {
-                    callBack.onResponse(responseParserPutOrPost(input, chayiResponse.response));
+                if (chayiResponse.isOk()) {
+                    callBack.onResponse(responseParserPutOrPost(input, chayiResponse.getResponse()));
                 } else {
                     callBack.fail("");
                 }
@@ -616,9 +616,9 @@ public abstract class Chayi {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 try {
                     ChayiResponse chayiResponse = handleResponse(response);
-                    if (chayiResponse.ok) {
+                    if (chayiResponse.isOk()) {
                         T newObject = RetrofitSingleTone.getInstance().getGson()
-                                .fromJson(chayiResponse.response.getJSONObject(Objects.requireNonNull(getObjectName(input))).toString(), (Type) Chayi.this.getClass());
+                                .fromJson(chayiResponse.getResponse().getJSONObject(Objects.requireNonNull(getObjectName(input))).toString(), (Type) Chayi.this.getClass());
 
                         callBack.onResponse(newObject);
                     } else {
@@ -651,7 +651,7 @@ public abstract class Chayi {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
                 ChayiResponse chayiResponse = handleResponse(response);
-                if (chayiResponse.ok) {
+                if (chayiResponse.isOk()) {
                     callBack.onResponse(null);
                 } else {
                     callBack.fail("");
@@ -665,55 +665,6 @@ public abstract class Chayi {
 
             }
         });
-    }
-
-    static class Error {
-        @Expose
-        Message messages;
-
-        public String getErrors() {
-            return messages.getErrors();
-        }
-    }
-
-    static class Message {
-        @Expose
-        List<ErrorItem> debug;
-        @Expose
-        List<ErrorItem> info;
-        @Expose
-        List<ErrorItem> success;
-        @Expose
-        List<ErrorItem> warning;
-        @Expose
-        List<ErrorItem> error;
-
-        public String getErrors() {
-            StringBuilder out = new StringBuilder();
-            for (ErrorItem item : error) {
-                out.append(item.body);
-            }
-            return out.toString();
-        }
-    }
-
-    static class ErrorItem {
-        @Expose
-        String body;
-        @Expose
-        String title;
-        @Expose
-        int code;
-    }
-
-    static class ChayiResponse {
-        boolean ok;
-        JSONObject response;
-
-        public ChayiResponse(boolean ok, JSONObject response) {
-            this.ok = ok;
-            this.response = response;
-        }
     }
 
     public int getId() {
