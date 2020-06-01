@@ -380,54 +380,54 @@ public abstract class Chayi {
     public static <T extends Chayi> void customPostRequest(SingleChayiCallBack<? extends Chayi> callBack, String function, T inputObject,
                                                            Object... args) {
         Class<?> input = inputObject.getClass();
-        Class<?> superClass = input.getSuperclass();
-        if (superClass != null && superClass.isInstance(Chayi.class)) {
-            boolean onItem = isOnItem(input, function);
-            String url;
-            if (onItem) {
-                url = getAllUrl(input) + "/" + (inputObject).getId() + "/" + function;
-            } else {
-                url = getAllUrl(input) + "/" + function;
+
+        boolean onItem = isOnItem(input, function);
+        String url;
+        if (onItem) {
+            url = getAllUrl(input) + "/" + (inputObject).getId() + "/" + function;
+        } else {
+            url = getAllUrl(input) + "/" + function;
+        }
+
+        boolean token = needToken(input, function);
+        RequestBody body = getCustomRequestBody(input, function, args);
+
+        ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
+
+        Call<ResponseBody> repos;
+        if (token)
+            repos = chayiInterface.post(url, body, Constants.getToken());
+        else
+            repos = chayiInterface.post(url, body);
+
+        repos.enqueue(new Callback<ResponseBody>() {
+            @Override
+            @EverythingIsNonNull
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                ChayiResponse chayiResponse = handleResponse(response);
+                if (chayiResponse.ok) {
+                    if (callBack instanceof SingleStatusChayiCallBack) {
+                        ((SingleStatusChayiCallBack<?>) callBack).onResponse(responseParserPutOrPost(input, chayiResponse.response), response.code());
+                    } else if (callBack != null)
+                        callBack.onResponse(responseParserPutOrPost(input, chayiResponse.response));
+                } else {
+                    callBack.fail("");
+                }
             }
 
-            boolean token = needToken(input, function);
-            RequestBody body = getCustomRequestBody(input, function, args);
+            @Override
+            @EverythingIsNonNull
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-            ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
+            }
+        });
 
-            Call<ResponseBody> repos;
-            if (token)
-                repos = chayiInterface.post(url, body, Constants.getToken());
-            else
-                repos = chayiInterface.post(url, body);
-
-            repos.enqueue(new Callback<ResponseBody>() {
-                @Override
-                @EverythingIsNonNull
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    ChayiResponse chayiResponse = handleResponse(response);
-                    if (chayiResponse.ok) {
-                        if (callBack instanceof SingleStatusChayiCallBack) {
-                            ((SingleStatusChayiCallBack<?>) callBack).onResponse(responseParserPutOrPost(input, chayiResponse.response), response.code());
-                        } else if (callBack != null)
-                            callBack.onResponse(responseParserPutOrPost(input, chayiResponse.response));
-                    } else {
-                        callBack.fail("");
-                    }
-                }
-
-                @Override
-                @EverythingIsNonNull
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                }
-            });
-        }
     }
 
     public static <T extends Chayi> void customPostRequest(ChayiCallBack<T> callBack, String function, T inputObject,
                                                            Object... args) {
         Class<?> input = inputObject.getClass();
+
         boolean onItem = isOnItem(input, function);
         String url;
         if (onItem) {
@@ -552,7 +552,6 @@ public abstract class Chayi {
         Log.i(TAG, "putRequest: " + jsonString);
         RequestBody body = RequestBody.create(MediaType.parse("json"), jsonString);
         Call<ResponseBody> repos = chayiInterface.put(url, body, Constants.getToken());
-
 
         repos.enqueue(new Callback<ResponseBody>() {
             @Override
