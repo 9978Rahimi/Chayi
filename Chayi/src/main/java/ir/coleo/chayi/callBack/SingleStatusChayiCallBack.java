@@ -1,11 +1,10 @@
 package ir.coleo.chayi.callBack;
 
-
 import ir.coleo.chayi.Chayi;
 
-public interface SingleStatusChayiCallBack extends SingleChayiCallBack {
+public interface SingleStatusChayiCallBack<T extends Chayi> extends SingleChayiCallBack<T> {
 
-    void onResponse(Chayi chayi, int statusCode);
+    void onResponse(T t, int statusCode);
 
 
 }

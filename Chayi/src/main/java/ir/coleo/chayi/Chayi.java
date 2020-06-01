@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -51,10 +52,14 @@ public abstract class Chayi {
         try {
             allUrl = input.getMethod("getPluralName");
             return (String) allUrl.invoke(null);
-        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
-        return null;
+        return "null";
     }
 
     private static String getObjectName(Class<?> input) {
@@ -62,13 +67,17 @@ public abstract class Chayi {
         try {
             allUrl = input.getMethod("getSingleName");
             return (String) allUrl.invoke(null);
-        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
-        return null;
+        return "null";
     }
 
-    public static void getAllRequest(Class<?> input, ChayiCallBack chayiCallBack) {
+    public static <T extends Chayi> void getAllRequest(Class<T> input, ChayiCallBack<T> chayiCallBack) {
         String url = getAllUrl(input);
         ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 
@@ -81,15 +90,10 @@ public abstract class Chayi {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 ChayiResponse chayiResponse = handleResponse(response);
                 if (chayiResponse.ok) {
-                    ArrayList<Chayi> chayis = Chayi.AllResponseParser(input, chayiResponse.response);
-                    for (Chayi temp : chayis) {
-                        Log.i(TAG, "onResponse: " + temp.toString());
-                    }
+                    ArrayList<T> chayis = Chayi.AllResponseParser(input, chayiResponse.response);
                     chayiCallBack.onResponse(chayis);
                 } else {
                     chayiCallBack.fail("");
-                    //todo
-
                 }
 
             }
@@ -102,10 +106,10 @@ public abstract class Chayi {
         });
     }
 
-    private static ArrayList<Chayi> AllResponseParser(Class<?> input, JSONObject response) {
+    private static <T extends Chayi> ArrayList<T> AllResponseParser(Class<?> input, JSONObject response) {
         try {
             JSONArray array = response.getJSONArray(getAllUrl(input));
-            ArrayList<Chayi> list = new ArrayList<>();
+            ArrayList<T> list = new ArrayList<>();
             for (int i = 0; i < array.length(); i++) {
                 if (i == 0) {
                     Log.i(TAG, "AllResponseParser: " + array.getJSONObject(i).toString());
@@ -119,24 +123,24 @@ public abstract class Chayi {
         return new ArrayList<>();
     }
 
-    private static Chayi responseParserPutOrPost(Class<?> input, JSONObject response) {
+    private static <T extends Chayi> T responseParserPutOrPost(Class<?> input, JSONObject response) {
         try {
-            return (Chayi) RetrofitSingleTone.getInstance().getGson()
-                    .fromJson(response.get(getObjectName(input)).toString(), input);
+            return RetrofitSingleTone.getInstance().getGson()
+                    .fromJson(response.get(getObjectName(input)).toString(), (Type) input);
         } catch (JSONException | NullPointerException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private static Chayi responseParser(Class<?> input, String response) {
-        return (Chayi) RetrofitSingleTone.getInstance().getGson().fromJson(response, input);
+    private static <T extends Chayi> T responseParser(Class<?> input, String response) {
+        return RetrofitSingleTone.getInstance().getGson().fromJson(response, (Type) input);
     }
 
     private static ChayiResponse handleResponse(Response<ResponseBody> response) {
         if (response.code() >= 100 && response.code() < 400) {
             if (response.body() != null) {
-                JSONObject responseObject = null;
+                JSONObject responseObject;
                 try {
                     responseObject = new JSONObject(response.body().string());
                     Constants.setToken(responseObject.getString("token"));
@@ -181,7 +185,7 @@ public abstract class Chayi {
         return getAllUrl(input) + "/" + id;
     }
 
-    public static JSONObject getOnlyId(Object input) {
+    public static <T extends Chayi> JSONObject getOnlyId(T input) {
         JSONObject output = new JSONObject();
         try {
             for (Field field : input.getClass().getDeclaredFields()) {
@@ -189,37 +193,43 @@ public abstract class Chayi {
                 if (field.isAnnotationPresent(Expose.class))
                     if (field.getType().isPrimitive()) {
                         output.put(field.getName(), field.get(input));
-                    } else if (field.getType().isInstance("")) {
+                    } else if (field.getType().isInstance(String.class)) {
                         output.put(field.getName(), field.get(input));
-                    } else if (!field.getType().equals(ArrayList.class)) {
+                    } else if (!field.getType().isInstance(List.class)) {
                         if (field.get(input) != null) {
-                            JSONObject innerObject = new JSONObject();
                             try {
                                 Object target = field.get(input);
-                                int id = (int) target.getClass().getDeclaredField("id").get(target);
-                                innerObject.put("id", id);
-                                output.put(field.getName(), innerObject);
+                                if (target != null) {
+                                    JSONObject innerObject = new JSONObject();
+                                    int id = (int) target.getClass().getDeclaredField("id").get(target);
+                                    innerObject.put("id", id);
+                                    output.put(field.getName(), innerObject);
+                                }
                             } catch (NoSuchFieldException e) {
                                 e.printStackTrace();
                             }
                         }
                     } else {
-                        JSONArray array = new JSONArray();
                         Object value = field.get(input);
-                        List<Objects> list = (List<Objects>) value;
-                        for (Object temp : list) {
-                            if (temp.getClass().isPrimitive() || temp.getClass().isInstance(""))
-                                continue;
-                            JSONObject innerObject = new JSONObject();
-                            try {
-                                int id = (int) temp.getClass().getDeclaredField("id").get(temp);
-                                innerObject.put("id", id);
-                                array.put(innerObject);
-                            } catch (NoSuchFieldException e) {
-                                e.printStackTrace();
+                        if (value instanceof List) {
+                            List<?> tempList = (List<?>) value;
+                            if (!tempList.isEmpty()) {
+                                JSONArray array = new JSONArray();
+                                for (Object temp : tempList) {
+                                    if (temp instanceof Chayi) {
+                                        JSONObject innerObject = new JSONObject();
+                                        try {
+                                            int id = (int) temp.getClass().getDeclaredField("id").get(temp);
+                                            innerObject.put("id", id);
+                                            array.put(innerObject);
+                                        } catch (NoSuchFieldException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
+                                output.put(field.getName(), array);
                             }
                         }
-                        output.put(field.getName(), array);
                     }
             }
 
@@ -228,6 +238,24 @@ public abstract class Chayi {
         }
         return output;
     }
+
+    private static <T extends Chayi> JSONArray convertToArrayOfId(List<T> list) throws IllegalAccessException, JSONException {
+        JSONArray array = new JSONArray();
+        for (T temp : list) {
+            if (temp.getClass().isPrimitive() || temp.getClass().isInstance(""))
+                continue;
+            JSONObject innerObject = new JSONObject();
+            try {
+                int id = (int) temp.getClass().getDeclaredField("id").get(temp);
+                innerObject.put("id", id);
+                array.put(innerObject);
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            }
+        }
+        return array;
+    }
+
 
     public JSONObject getPutJsonObject(Object input, boolean inner) {
         JSONObject object = new JSONObject();
@@ -241,22 +269,26 @@ public abstract class Chayi {
                     } else if (field.getType().isInstance("")) {
                         output.put(field.getName(), field.get(input));
                     } else if (!field.getType().isInstance(List.class)) {
-                        if (field.get(input) != null)
-                            output.put(field.getName(), getPutJsonObject(field.get(input), true));
+                        Object temp = field.get(input);
+                        if (temp != null)
+                            output.put(field.getName(), getPutJsonObject(temp, true));
                     }
             }
-            for (Field field : input.getClass().getSuperclass().getDeclaredFields()) {
-                field.setAccessible(true);
-                if (field.isAnnotationPresent(Expose.class))
-                    if (field.getType().isPrimitive()) {
-                        output.put(field.getName(), field.get(input));
-                    } else if (field.getType().isInstance("")) {
-                        output.put(field.getName(), field.get(input));
-                    } else if (!field.getType().isInstance(List.class)) {
-                        if (field.get(input) != null)
-                            output.put(field.getName(), getPutJsonObject(field.get(input), true));
-                    }
-            }
+            Class<?> superClass = input.getClass().getSuperclass();
+            if (superClass != null)
+                for (Field field : superClass.getDeclaredFields()) {
+                    field.setAccessible(true);
+                    if (field.isAnnotationPresent(Expose.class))
+                        if (field.getType().isPrimitive()) {
+                            output.put(field.getName(), field.get(input));
+                        } else if (field.getType().isInstance("")) {
+                            output.put(field.getName(), field.get(input));
+                        } else if (!field.getType().isInstance(List.class)) {
+                            Object temp = field.get(input);
+                            if (temp != null)
+                                output.put(field.getName(), getPutJsonObject(temp, true));
+                        }
+                }
             if (inner) {
                 return output;
             } else {
@@ -269,7 +301,7 @@ public abstract class Chayi {
     }
 
 
-    public static RequestBody getCreateJsonObject(Class<?> input, Object... args) {
+    public static <T> RequestBody getCreateJsonObject(Class<T> input, Object... args) {
         Method[] methods;
         Method target = null;
         try {
@@ -286,13 +318,15 @@ public abstract class Chayi {
             Object output = target.invoke(null, args);
             if (output instanceof RequestBody)
                 return (RequestBody) output;
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
         return RequestBody.create(MediaType.parse("json"), "{}");
     }
 
-    private static RequestBody getCustomRequestBody(Class<?> input, String function, Object... args) {
+    private static <T> RequestBody getCustomRequestBody(Class<T> input, String function, Object... args) {
         Method[] methods;
         Method target = null;
         try {
@@ -309,57 +343,95 @@ public abstract class Chayi {
             Object output = target.invoke(null, args);
             if (output instanceof RequestBody)
                 return (RequestBody) output;
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
         return RequestBody.create(MediaType.parse("json"), "{}");
     }
 
-    @Deprecated
-    private static Object parseCustomRequestBody(Class<?> input, String function, Response<ResponseBody> response) {
-        Method method;
-        try {
-            method = input.getMethod(function + "_response", Response.class);
-            return method.invoke(null, response);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return RequestBody.create(MediaType.parse("json"), "{}");
-    }
-
-    private static boolean needToken(Class<?> input, String function) {
+    private static <T> boolean needToken(Class<T> input, String function) {
         try {
             Field field;
             field = input.getField(function + "_token");
             return field.getBoolean(null);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
         return false;
     }
 
-    private static boolean isOnItem(Class<?> input, String function) {
+    private static <T> boolean isOnItem(Class<T> input, String function) {
         try {
             Field field;
             field = input.getField(function + "_on_item");
             return field.getBoolean(null);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
         return false;
     }
 
-    public static void customPostRequest(SingleChayiCallBack callBack, String function, Object inputObject,
-                                         Object... args) {
+    public static <T extends Chayi> void customPostRequest(SingleChayiCallBack<? extends Chayi> callBack, String function, T inputObject,
+                                                           Object... args) {
+        Class<?> input = inputObject.getClass();
+        Class<?> superClass = input.getSuperclass();
+        if (superClass != null && superClass.isInstance(Chayi.class)) {
+            boolean onItem = isOnItem(input, function);
+            String url;
+            if (onItem) {
+                url = getAllUrl(input) + "/" + (inputObject).getId() + "/" + function;
+            } else {
+                url = getAllUrl(input) + "/" + function;
+            }
+
+            boolean token = needToken(input, function);
+            RequestBody body = getCustomRequestBody(input, function, args);
+
+            ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
+
+            Call<ResponseBody> repos;
+            if (token)
+                repos = chayiInterface.post(url, body, Constants.getToken());
+            else
+                repos = chayiInterface.post(url, body);
+
+            repos.enqueue(new Callback<ResponseBody>() {
+                @Override
+                @EverythingIsNonNull
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    ChayiResponse chayiResponse = handleResponse(response);
+                    if (chayiResponse.ok) {
+                        if (callBack instanceof SingleStatusChayiCallBack) {
+                            ((SingleStatusChayiCallBack<?>) callBack).onResponse(responseParserPutOrPost(input, chayiResponse.response), response.code());
+                        } else if (callBack != null)
+                            callBack.onResponse(responseParserPutOrPost(input, chayiResponse.response));
+                    } else {
+                        callBack.fail("");
+                    }
+                }
+
+                @Override
+                @EverythingIsNonNull
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                }
+            });
+        }
+    }
+
+    public static <T extends Chayi> void customPostRequest(ChayiCallBack<T> callBack, String function, T inputObject,
+                                                           Object... args) {
         Class<?> input = inputObject.getClass();
         boolean onItem = isOnItem(input, function);
         String url;
         if (onItem) {
-            if (inputObject instanceof Chayi) {
-                url = getAllUrl(input) + "/" + ((Chayi) inputObject).getId() + "/" + function;
-            } else {
-                url = getAllUrl(input) + "/" + function;
-            }
+            url = getAllUrl(input) + "/" + (inputObject).getId() + "/" + function;
         } else {
             url = getAllUrl(input) + "/" + function;
         }
@@ -381,59 +453,7 @@ public abstract class Chayi {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 ChayiResponse chayiResponse = handleResponse(response);
                 if (chayiResponse.ok) {
-                    if (callBack instanceof SingleStatusChayiCallBack) {
-                        ((SingleStatusChayiCallBack) callBack).onResponse(responseParserPutOrPost(input, chayiResponse.response), response.code());
-                    } else if (callBack != null)
-                        callBack.onResponse(responseParserPutOrPost(input, chayiResponse.response));
-                } else {
-                    callBack.fail("");
-                }
-            }
-
-            @Override
-            @EverythingIsNonNull
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-            }
-        });
-    }
-
-    public static void customPostRequest(ChayiCallBack callBack, String function, Object inputObject,
-                                         Object... args) {
-        Class<?> input = inputObject.getClass();
-        boolean onItem = isOnItem(input, function);
-        String url;
-        if (onItem) {
-            if (inputObject instanceof Chayi) {
-                url = getAllUrl(input) + "/" + ((Chayi) inputObject).getId() + "/" + function;
-            } else {
-                url = getAllUrl(input) + "/" + function;
-            }
-        } else {
-            url = getAllUrl(input) + "/" + function;
-        }
-
-        boolean token = needToken(input, function);
-        RequestBody body = getCustomRequestBody(input, function, args);
-
-        ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
-
-        Call<ResponseBody> repos;
-        if (token)
-            repos = chayiInterface.post(url, body, Constants.getToken());
-        else
-            repos = chayiInterface.post(url, body);
-
-        repos.enqueue(new Callback<ResponseBody>() {
-            @Override
-            @EverythingIsNonNull
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                ChayiResponse chayiResponse = handleResponse(response);
-                if (chayiResponse.ok) {
-                    ArrayList<Chayi> chayis = Chayi.AllResponseParser(input, chayiResponse.response);
-                    for (Chayi temp : chayis) {
-                        Log.i(TAG, "onResponse: " + temp.toString());
-                    }
+                    ArrayList<T> chayis = Chayi.AllResponseParser(input, chayiResponse.response);
                     callBack.onResponse(chayis);
                 } else {
                     callBack.fail("");
@@ -448,8 +468,8 @@ public abstract class Chayi {
         });
     }
 
-    public static void customPostRequest(ChayiCallBack callBack, String function, Class<?> input,
-                                         Object... args) {
+    public static <T extends Chayi> void customPostRequest(ChayiCallBack<T> callBack, String function, Class<?> input,
+                                                           Object... args) {
         boolean onItem = isOnItem(input, function);
         String url = getAllUrl(input) + "/" + function;
 
@@ -470,10 +490,7 @@ public abstract class Chayi {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 ChayiResponse chayiResponse = handleResponse(response);
                 if (chayiResponse.ok) {
-                    ArrayList<Chayi> chayis = Chayi.AllResponseParser(input, chayiResponse.response);
-                    for (Chayi temp : chayis) {
-                        Log.i(TAG, "onResponse: " + temp.toString());
-                    }
+                    ArrayList<T> chayis = Chayi.AllResponseParser(input, chayiResponse.response);
                     callBack.onResponse(chayis);
                 } else {
                     callBack.fail("");
@@ -488,8 +505,8 @@ public abstract class Chayi {
         });
     }
 
-    public static void customPostRequest(SingleChayiCallBack callBack, String function, Class<?> input,
-                                         Object... args) {
+    public static <T extends Chayi> void customPostRequest(SingleChayiCallBack<T> callBack, String function, Class<T> input,
+                                                           Object... args) {
         boolean onItem = isOnItem(input, function);
         String url = getAllUrl(input) + "/" + function;
 
@@ -511,7 +528,7 @@ public abstract class Chayi {
                 ChayiResponse chayiResponse = handleResponse(response);
                 if (chayiResponse.ok) {
                     if (callBack instanceof SingleStatusChayiCallBack) {
-                        ((SingleStatusChayiCallBack) callBack).onResponse(responseParserPutOrPost(input, chayiResponse.response), response.code());
+                        ((SingleStatusChayiCallBack<T>) callBack).onResponse(responseParserPutOrPost(input, chayiResponse.response), response.code());
                     } else if (callBack != null)
                         callBack.onResponse(responseParserPutOrPost(input, chayiResponse.response));
                 } else {
@@ -527,7 +544,7 @@ public abstract class Chayi {
         });
     }
 
-    public void putRequest(SingleChayiCallBack callBack, Class<?> input) {
+    public <T extends Chayi> void putRequest(SingleChayiCallBack<T> callBack, Class<?> input) {
         String url = getUrl(input);
         ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 
@@ -559,7 +576,7 @@ public abstract class Chayi {
 
     }
 
-    public static void postRequest(SingleChayiCallBack callBack, Class<?> input, Object... args) {
+    public static <T extends Chayi> void postRequest(SingleChayiCallBack<T> callBack, Class<?> input, Object... args) {
         String url = getAllUrl(input);
         ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 
@@ -587,7 +604,7 @@ public abstract class Chayi {
 
     }
 
-    public void getRequest(SingleChayiCallBack callBack, Class<?> input) {
+    public <T extends Chayi> void getRequest(SingleChayiCallBack<T> callBack, Class<?> input) {
         String url = getUrl(this.getClass());
         ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 
@@ -601,12 +618,12 @@ public abstract class Chayi {
                 try {
                     ChayiResponse chayiResponse = handleResponse(response);
                     if (chayiResponse.ok) {
-                        Chayi newObject = RetrofitSingleTone.getInstance().getGson()
-                                .fromJson(chayiResponse.response.getJSONObject(Objects.requireNonNull(getObjectName(input))).toString(), Chayi.this.getClass());
+                        T newObject = RetrofitSingleTone.getInstance().getGson()
+                                .fromJson(chayiResponse.response.getJSONObject(Objects.requireNonNull(getObjectName(input))).toString(), (Type) Chayi.this.getClass());
 
                         callBack.onResponse(newObject);
                     } else {
-                        callBack.fail("");//todo
+                        callBack.fail("");
                     }
 
                 } catch (JSONException e) {
@@ -622,7 +639,7 @@ public abstract class Chayi {
         });
     }
 
-    public void deleteRequest(SingleChayiCallBack callBack, Class<?> input) {
+    public <T extends Chayi> void deleteRequest(SingleChayiCallBack<T> callBack, Class<?> input) {
         String url = getUrl(getClass());
         ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 
@@ -638,9 +655,8 @@ public abstract class Chayi {
                 if (chayiResponse.ok) {
                     callBack.onResponse(null);
                 } else {
-                    callBack.fail("");//todo
+                    callBack.fail("");
                 }
-
 
             }
 

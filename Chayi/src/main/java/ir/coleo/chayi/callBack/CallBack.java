@@ -4,5 +4,4 @@ public interface CallBack {
 
     void fail(String errorMassage);
 
-
 }
