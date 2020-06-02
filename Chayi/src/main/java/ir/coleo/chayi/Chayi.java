@@ -21,9 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import ir.coleo.chayi.callBack.ChayiCallBack;
-import ir.coleo.chayi.callBack.SingleChayiCallBack;
-import ir.coleo.chayi.callBack.SingleStatusChayiCallBack;
+import ir.coleo.chayi.callBack.ChayiCallBackOne;
+import ir.coleo.chayi.callBack.SingleChayiCallBackOne;
+import ir.coleo.chayi.callBack.SingleStatusChayiCallBackOne;
 import ir.coleo.chayi.constats.ChayiInterface;
 import ir.coleo.chayi.constats.Constants;
 import ir.coleo.chayi.constats.RetrofitSingleTone;
@@ -79,7 +79,7 @@ public abstract class Chayi {
         return "null";
     }
 
-    public static <T extends Chayi> void getAllRequest(Class<T> input, ChayiCallBack<T> chayiCallBack) {
+    public static <T extends Chayi> void getAllRequest(Class<T> input, ChayiCallBackOne<T> chayiCallBack) {
         String url = getAllUrl(input);
         ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 
@@ -377,7 +377,7 @@ public abstract class Chayi {
         return RequestBody.create(MediaType.parse("json"), "{}");
     }
 
-    public static <T extends Chayi> void customPostRequest(SingleChayiCallBack<? extends Chayi> callBack, String function, T inputObject,
+    public static <T extends Chayi> void customPostRequest(SingleChayiCallBackOne<? extends Chayi> callBack, String function, T inputObject,
                                                            Object... args) {
         Class<?> input = inputObject.getClass();
 
@@ -406,8 +406,8 @@ public abstract class Chayi {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 ChayiResponse chayiResponse = handleResponse(response);
                 if (chayiResponse.isOk()) {
-                    if (callBack instanceof SingleStatusChayiCallBack) {
-                        ((SingleStatusChayiCallBack<?>) callBack).onResponse(responseParserPutOrPost(input, chayiResponse.getResponse()), response.code());
+                    if (callBack instanceof SingleStatusChayiCallBackOne) {
+                        ((SingleStatusChayiCallBackOne<?>) callBack).onResponse(responseParserPutOrPost(input, chayiResponse.getResponse()), response.code());
                     } else if (callBack != null)
                         callBack.onResponse(responseParserPutOrPost(input, chayiResponse.getResponse()));
                 } else {
@@ -424,7 +424,7 @@ public abstract class Chayi {
 
     }
 
-    public static <T extends Chayi> void customPostRequest(ChayiCallBack<T> callBack, String function, T inputObject,
+    public static <T extends Chayi> void customPostRequest(ChayiCallBackOne<T> callBack, String function, T inputObject,
                                                            Object... args) {
         Class<?> input = inputObject.getClass();
 
@@ -468,7 +468,7 @@ public abstract class Chayi {
         });
     }
 
-    public static <T extends Chayi> void customPostRequest(ChayiCallBack<T> callBack, String function, Class<?> input,
+    public static <T extends Chayi> void customPostRequest(ChayiCallBackOne<T> callBack, String function, Class<?> input,
                                                            Object... args) {
         boolean onItem = isOnItem(input, function);
         String url = getAllUrl(input) + "/" + function;
@@ -505,7 +505,7 @@ public abstract class Chayi {
         });
     }
 
-    public static <T extends Chayi> void customPostRequest(SingleChayiCallBack<T> callBack, String function, Class<T> input,
+    public static <T extends Chayi> void customPostRequest(SingleChayiCallBackOne<T> callBack, String function, Class<T> input,
                                                            Object... args) {
         boolean onItem = isOnItem(input, function);
         String url = getAllUrl(input) + "/" + function;
@@ -527,8 +527,8 @@ public abstract class Chayi {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 ChayiResponse chayiResponse = handleResponse(response);
                 if (chayiResponse.isOk()) {
-                    if (callBack instanceof SingleStatusChayiCallBack) {
-                        ((SingleStatusChayiCallBack<T>) callBack).onResponse(responseParserPutOrPost(input, chayiResponse.getResponse()), response.code());
+                    if (callBack instanceof SingleStatusChayiCallBackOne) {
+                        ((SingleStatusChayiCallBackOne<T>) callBack).onResponse(responseParserPutOrPost(input, chayiResponse.getResponse()), response.code());
                     } else if (callBack != null)
                         callBack.onResponse(responseParserPutOrPost(input, chayiResponse.getResponse()));
                 } else {
@@ -544,7 +544,7 @@ public abstract class Chayi {
         });
     }
 
-    public static <T extends Chayi> void postRequest(SingleChayiCallBack<T> callBack, Class<?> input, Object... args) {
+    public static <T extends Chayi> void postRequest(SingleChayiCallBackOne<T> callBack, Class<?> input, Object... args) {
         String url = getAllUrl(input);
         ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 
@@ -572,7 +572,7 @@ public abstract class Chayi {
 
     }
 
-    public <T extends Chayi> void putRequest(SingleChayiCallBack<T> callBack, Class<?> input) {
+    public <T extends Chayi> void putRequest(SingleChayiCallBackOne<T> callBack, Class<?> input) {
         String url = getUrl(input);
         ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 
@@ -603,7 +603,7 @@ public abstract class Chayi {
 
     }
 
-    public <T extends Chayi> void getRequest(SingleChayiCallBack<T> callBack, Class<?> input) {
+    public <T extends Chayi> void getRequest(SingleChayiCallBackOne<T> callBack, Class<?> input) {
         String url = getUrl(this.getClass());
         ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 
@@ -638,7 +638,7 @@ public abstract class Chayi {
         });
     }
 
-    public <T extends Chayi> void deleteRequest(SingleChayiCallBack<T> callBack, Class<?> input) {
+    public <T extends Chayi> void deleteRequest(SingleChayiCallBackOne<T> callBack, Class<?> input) {
         String url = getUrl(getClass());
         ChayiInterface chayiInterface = RetrofitSingleTone.getInstance().getChayiInterface();
 

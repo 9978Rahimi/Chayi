@@ -3,7 +3,7 @@ package ir.coleo.chayi.callBack;
 
 import ir.coleo.chayi.Chayi;
 
-public interface SingleChayiCallBack<T extends Chayi> extends CallBack {
+public interface SingleChayiCallBackOne<T extends Chayi> extends CallBackOne {
 
     void onResponse(T T);
 

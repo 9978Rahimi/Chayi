@@ -1,6 +1,6 @@
 package ir.coleo.chayi.callBack;
 
-public interface CallBack {
+public interface CallBackOne {
 
     void fail(String errorMassage);
 

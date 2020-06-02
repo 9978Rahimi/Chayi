@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import ir.coleo.chayi.Chayi;
 
 
-public interface ChayiCallBack<T extends Chayi> extends CallBack {
+public interface ChayiCallBackOne<T extends Chayi> extends CallBackOne {
 
 
     void onResponse(ArrayList<T> list);
