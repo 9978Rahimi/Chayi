@@ -38,9 +38,35 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(view -> putName());
         code.setOnClickListener(v -> {
 
-            PipLine.request(RequestType.GET, Citizen.class, false, new UserCallBack<ArrayList<Citizen>>() {
+            PipLine.request(RequestType.POST, Citizen.class, false, new UserCallBack<ArrayList<Citizen>>() {
                 @Override
                 public void success(ArrayList<Citizen> citizens) {
+
+                }
+
+                @Override
+                public void fail() {
+
+                }
+            });
+
+            PipLine.request("app_enter", Citizen.class, true, new UserCallBack<Citizen>() {
+
+                @Override
+                public void success(Citizen citizen) {
+
+                }
+
+                @Override
+                public void fail() {
+
+                }
+            });
+
+            Citizen citizen = new Citizen();
+            PipLine.request(RequestType.GET, citizen, true, new UserCallBack<Citizen>() {
+                @Override
+                public void success(Citizen citizen) {
 
                 }
 

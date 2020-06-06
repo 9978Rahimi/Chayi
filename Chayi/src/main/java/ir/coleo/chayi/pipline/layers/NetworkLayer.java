@@ -5,7 +5,7 @@ import ir.coleo.chayi.pipline.NetworkData;
 
 public abstract class NetworkLayer implements Caller {
 
-    private NetworkLayer nextLayer;
+    protected NetworkLayer nextLayer;
 
     public NetworkLayer(NetworkLayer nextLayer) {
         this.nextLayer = nextLayer;
