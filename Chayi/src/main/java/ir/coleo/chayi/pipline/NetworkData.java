@@ -10,11 +10,16 @@ import ir.coleo.chayi.Chayi;
 public class NetworkData {
 
     private static String TAG = NetworkData.class.getSimpleName();
+
+    private boolean needToken;
+    private String token;
+
+    private Class<? extends Chayi> input;
+    private String functionName;
     private boolean onItem;
     private boolean single;
-    private String functionName;
-    private Class<? extends Chayi> input;
     private String url;
+
     private ArrayList<Object> requestData;
     private UserCallBack<?> callBack;
     private RequestType requestType;
@@ -29,6 +34,22 @@ public class NetworkData {
 
     public NetworkData(UserCallBack<?> callBack, Class<? extends Chayi> input, boolean single) {
         this(callBack, RequestType.GET, input, single);
+    }
+
+    public boolean isNeedToken() {
+        return needToken;
+    }
+
+    public void setNeedToken(boolean needToken) {
+        this.needToken = needToken;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public int getId() {

@@ -40,8 +40,10 @@ public class ConnectionLayer extends NetworkLayer {
 
     @Override
     public NetworkData after(NetworkData data) {
-        super.nextLayer = tempNextLayer;
-        data.getCallBack().fail();
+        if (!isConnected) {
+            super.nextLayer = tempNextLayer;
+            data.getCallBack().fail();
+        }
         return null;
     }
 }

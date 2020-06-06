@@ -1,10 +1,8 @@
 package ir.coleo.chayi.constats;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 public class Constants {
 
@@ -42,7 +40,6 @@ public class Constants {
      * ذخیره کلید ارطباط با سرور در حافظه
      */
     public static void setToken(String token) {
-        Log.i(TAG, "setToken: token = " + token);
         SharedPreferences sharedPreferences = context.getSharedPreferences(TOKEN_STORAGE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(TOKEN_DATA, token);
