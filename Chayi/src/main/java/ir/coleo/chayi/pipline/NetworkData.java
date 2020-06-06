@@ -1,35 +1,74 @@
 package ir.coleo.chayi.pipline;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
+
+import ir.coleo.chayi.Chayi;
 
 /**
  * use this class to pass data between layers
  */
 public class NetworkData {
 
-    private Type returnType;
+    private static String TAG = NetworkData.class.getSimpleName();
+    private boolean onItem;
+    private boolean single;
+    private String functionName;
+    private Class<? extends Chayi> input;
     private String url;
     private ArrayList<Object> requestData;
     private UserCallBack<?> callBack;
     private RequestType requestType;
+    private int id;
 
-    public NetworkData(UserCallBack<?> callBack, RequestType requestType) {
+    public NetworkData(UserCallBack<?> callBack, RequestType requestType, Class<? extends Chayi> input, boolean single) {
         this.callBack = callBack;
         this.requestType = requestType;
-        this.returnType = callBack.getClass().getGenericInterfaces()[0];
+        this.single = single;
+        this.input = input;
     }
 
-    public NetworkData(UserCallBack<?> callBack) {
-        this(callBack, RequestType.GET);
+    public NetworkData(UserCallBack<?> callBack, Class<? extends Chayi> input, boolean single) {
+        this(callBack, RequestType.GET, input, single);
     }
 
-    public Type getReturnType() {
-        return returnType;
+    public int getId() {
+        return id;
     }
 
-    public void setReturnType(Type returnType) {
-        this.returnType = returnType;
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public boolean isSingle() {
+        return single;
+    }
+
+    public void setSingle(boolean single) {
+        this.single = single;
+    }
+
+    public Class<? extends Chayi> getInput() {
+        return input;
+    }
+
+    public void setInput(Class<? extends Chayi> input) {
+        this.input = input;
+    }
+
+    public String getFunctionName() {
+        return functionName;
+    }
+
+    public void setFunctionName(String functionName) {
+        this.functionName = functionName;
+    }
+
+    public boolean isOnItem() {
+        return onItem;
+    }
+
+    public void setOnItem(boolean onItem) {
+        this.onItem = onItem;
     }
 
     public String getUrl() {

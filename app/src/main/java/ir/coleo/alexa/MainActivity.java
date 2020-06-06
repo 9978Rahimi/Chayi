@@ -6,10 +6,13 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
+
 import ir.coleo.alexa.testing_models.Citizen;
 import ir.coleo.alexa.testing_models.HistoryRequest;
 import ir.coleo.chayi.constats.Constants;
 import ir.coleo.chayi.pipline.PipLine;
+import ir.coleo.chayi.pipline.RequestType;
 import ir.coleo.chayi.pipline.UserCallBack;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,9 +38,9 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(view -> putName());
         code.setOnClickListener(v -> {
 
-            PipLine.request(PipLine.RequestType.DELETE, new UserCallBack<Citizen>() {
+            PipLine.request(RequestType.GET, Citizen.class, false, new UserCallBack<ArrayList<Citizen>>() {
                 @Override
-                public void success(Citizen citizen) {
+                public void success(ArrayList<Citizen> citizens) {
 
                 }
 
