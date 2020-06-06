@@ -1,8 +1,8 @@
-package ir.coleo.alexa.testing_models;
+package ir.coleo.alexa.models;
 
 import com.google.gson.annotations.Expose;
 
-public class Image {
+public class File {
 
     @Expose(serialize = false)
     String file;

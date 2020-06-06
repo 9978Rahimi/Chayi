@@ -1,4 +1,4 @@
-package ir.coleo.alexa.testing_models;
+package ir.coleo.alexa.models;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -8,7 +8,7 @@ import ir.coleo.chayi.Chayi;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 
-public class DriverAppVersion extends Chayi {
+public class CitizenAppVersion extends Chayi {
 
     @Expose
     protected String version_name;
@@ -21,16 +21,16 @@ public class DriverAppVersion extends Chayi {
     @Expose
     protected boolean force_update;
 
-    public DriverAppVersion() {
+    public CitizenAppVersion() {
     }
 
-    public DriverAppVersion(DriverAppVersion driver_app_version) {
-        this.id = driver_app_version.id;
-        this.version_name = driver_app_version.version_name;
-        this.version_code = driver_app_version.version_code;
-        this.date_created = driver_app_version.date_created;
-        this.available_update = driver_app_version.available_update;
-        this.force_update = driver_app_version.force_update;
+    public CitizenAppVersion(CitizenAppVersion citizen_app_version) {
+        this.id = citizen_app_version.id;
+        this.version_name = citizen_app_version.version_name;
+        this.version_code = citizen_app_version.version_code;
+        this.date_created = citizen_app_version.date_created;
+        this.available_update = citizen_app_version.available_update;
+        this.force_update = citizen_app_version.force_update;
     }
 
     public static final boolean create_token = true;
@@ -42,7 +42,7 @@ public class DriverAppVersion extends Chayi {
     public static RequestBody create_request(String version_name, Integer version_code, boolean available_update, boolean force_update) {
         JsonObject wrapper = new JsonObject();
         JsonObject object = new JsonObject();
-        wrapper.add("driver_app_version", object);
+        wrapper.add("citizen_app_version", object);
         object.add("version_name", new JsonPrimitive(version_name));
         object.add("version_code", new JsonPrimitive(version_code));
         object.add("available_update", new JsonPrimitive(available_update));
@@ -99,18 +99,18 @@ public class DriverAppVersion extends Chayi {
 
 
     public static String getPluralName() {
-        return "driver_app_versions";
+        return "citizen_app_versions";
     }
 
     public static String getSingleName() {
-        return "driver_app_version";
+        return "citizen_app_version";
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DriverAppVersion temp = (DriverAppVersion) o;
+        CitizenAppVersion temp = (CitizenAppVersion) o;
         return this.id == temp.id;
     }
 }

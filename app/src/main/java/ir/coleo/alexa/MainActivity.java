@@ -8,8 +8,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 
-import ir.coleo.alexa.testing_models.Citizen;
-import ir.coleo.alexa.testing_models.HistoryRequest;
+import ir.coleo.alexa.models.Citizen;
+import ir.coleo.alexa.models.android.HistoryRequest;
 import ir.coleo.chayi.constats.Constants;
 import ir.coleo.chayi.pipline.PipLine;
 import ir.coleo.chayi.pipline.RequestType;
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 public void fail() {
 
                 }
-            });
+            }, "09384142925");
 
             Citizen citizen = new Citizen();
             PipLine.request(RequestType.GET, citizen, true, new UserCallBack<Citizen>() {

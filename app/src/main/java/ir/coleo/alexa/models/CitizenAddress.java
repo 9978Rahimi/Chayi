@@ -1,4 +1,4 @@
-package ir.coleo.alexa.testing_models;
+package ir.coleo.alexa.models;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
