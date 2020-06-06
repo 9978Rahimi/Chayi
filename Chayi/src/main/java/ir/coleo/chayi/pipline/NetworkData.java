@@ -3,6 +3,7 @@ package ir.coleo.chayi.pipline;
 import java.util.ArrayList;
 
 import ir.coleo.chayi.Chayi;
+import okhttp3.RequestBody;
 
 /**
  * use this class to pass data between layers
@@ -20,6 +21,8 @@ public class NetworkData {
     private boolean single;
     private String url;
 
+    private RequestBody body;
+
     private ArrayList<Object> requestData;
     private UserCallBack<?> callBack;
     private RequestType requestType;
@@ -34,6 +37,14 @@ public class NetworkData {
 
     public NetworkData(UserCallBack<?> callBack, Class<? extends Chayi> input, boolean single) {
         this(callBack, RequestType.GET, input, single);
+    }
+
+    public RequestBody getBody() {
+        return body;
+    }
+
+    public void setBody(RequestBody body) {
+        this.body = body;
     }
 
     public boolean isNeedToken() {

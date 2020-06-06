@@ -44,6 +44,6 @@ public class ConnectionLayer extends NetworkLayer {
             super.nextLayer = tempNextLayer;
             data.getCallBack().fail();
         }
-        return null;
+        return data;
     }
 }

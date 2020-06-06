@@ -1,6 +1,7 @@
 package ir.coleo.chayi.pipline;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import ir.coleo.chayi.Chayi;
 import ir.coleo.chayi.pipline.layers.ConnectionLayer;
@@ -45,23 +46,27 @@ public class PipLine {
         return instance;
     }
 
-    public static void request(String functionName, Class<? extends Chayi> input, boolean single, UserCallBack<?> callBack) {
+    //todo organize methods
+
+    public static void request(String functionName, Class<? extends Chayi> input, boolean single, UserCallBack<?> callBack, Object... args) {
         PipLine pipLine = getInstance();
         NetworkLayer layer = pipLine.layers.get(pipLine.layers.size() - 1);
         NetworkData data = new NetworkData(callBack, RequestType.CUSTOM_POST, input, single);
         data.setFunctionName(functionName);
+        data.setRequestData(new ArrayList<>(Arrays.asList(args)));
         layer.lunch(data);
     }
 
-    public static void request(RequestType type, Chayi input, boolean single, UserCallBack<?> callBack) {
+    public static void request(RequestType type, Chayi input, boolean single, UserCallBack<?> callBack, Object... args) {
         PipLine pipLine = getInstance();
         NetworkLayer layer = pipLine.layers.get(pipLine.layers.size() - 1);
         NetworkData data = new NetworkData(callBack, type, input.getClass(), single);
         data.setId(input.getId());
+        data.setRequestData(new ArrayList<>(Arrays.asList(args)));
         layer.lunch(data);
     }
 
-    public static void request(RequestType type, Class<? extends Chayi> input, boolean single, UserCallBack<?> callBack) {
+    public static void request(RequestType type, Class<? extends Chayi> input, boolean single, UserCallBack<?> callBack, Object... args) {
         PipLine pipLine = getInstance();
         NetworkLayer layer = pipLine.layers.get(pipLine.layers.size() - 1);
         layer.lunch(new NetworkData(callBack, type, input, single));

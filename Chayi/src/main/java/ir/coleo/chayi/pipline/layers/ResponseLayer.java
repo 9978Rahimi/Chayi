@@ -10,16 +10,16 @@ public class ResponseLayer extends NetworkLayer {
 
     @Override
     public NetworkData before(NetworkData data) {
-        return null;
+        return data;
     }
 
     @Override
     public NetworkData work(NetworkData data) {
-        return null;
+        return data;
     }
 
     @Override
     public NetworkData after(NetworkData data) {
-        return null;
+        return data;
     }
 }
