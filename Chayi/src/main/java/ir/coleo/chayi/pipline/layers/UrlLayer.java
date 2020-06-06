@@ -14,7 +14,7 @@ public class UrlLayer extends NetworkLayer {
         super(nextLayer);
     }
 
-    private static String getAllUrl(Class<?> input) {
+    public static String getAllUrl(Class<?> input) {
         Method allUrl;
         try {
             allUrl = input.getMethod("getPluralName");
@@ -42,7 +42,7 @@ public class UrlLayer extends NetworkLayer {
         return false;
     }
 
-    private static String getObjectName(Class<?> input) {
+    public static String getObjectName(Class<?> input) {
         Method allUrl;
         try {
             allUrl = input.getMethod("getSingleName");

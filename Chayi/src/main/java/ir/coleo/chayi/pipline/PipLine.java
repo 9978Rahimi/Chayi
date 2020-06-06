@@ -47,6 +47,15 @@ public class PipLine {
     }
 
     //todo organize methods
+    /*
+    Thread t = new Thread(new Runnable() {
+         @Override
+         public void run() {
+              // Insert some method call here.
+         }
+});
+     */
+
 
     public static void request(String functionName, Class<? extends Chayi> input, boolean single, UserCallBack<?> callBack, Object... args) {
         PipLine pipLine = getInstance();

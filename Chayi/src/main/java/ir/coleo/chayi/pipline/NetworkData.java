@@ -1,9 +1,13 @@
 package ir.coleo.chayi.pipline;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 import ir.coleo.chayi.Chayi;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Response;
 
 /**
  * use this class to pass data between layers
@@ -23,6 +27,9 @@ public class NetworkData {
 
     private RequestBody body;
 
+    private Response<ResponseBody> bodyResponse;
+    private JSONObject response;
+
     private ArrayList<Object> requestData;
     private UserCallBack<?> callBack;
     private RequestType requestType;
@@ -37,6 +44,22 @@ public class NetworkData {
 
     public NetworkData(UserCallBack<?> callBack, Class<? extends Chayi> input, boolean single) {
         this(callBack, RequestType.GET, input, single);
+    }
+
+    public JSONObject getResponse() {
+        return response;
+    }
+
+    public void setResponse(JSONObject response) {
+        this.response = response;
+    }
+
+    public Response<ResponseBody> getBodyResponse() {
+        return bodyResponse;
+    }
+
+    public void setBodyResponse(Response<ResponseBody> bodyResponse) {
+        this.bodyResponse = bodyResponse;
     }
 
     public RequestBody getBody() {

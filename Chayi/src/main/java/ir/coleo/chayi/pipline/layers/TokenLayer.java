@@ -1,5 +1,7 @@
 package ir.coleo.chayi.pipline.layers;
 
+import org.json.JSONException;
+
 import java.lang.reflect.Field;
 
 import ir.coleo.chayi.constats.Constants;
@@ -28,6 +30,10 @@ public class TokenLayer extends NetworkLayer {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public static boolean haveToken() {
+        return !Constants.getToken().equals("Token " + Constants.NO_TOKEN);
     }
 
     @Override
@@ -61,6 +67,14 @@ public class TokenLayer extends NetworkLayer {
         if (tokenFail) {
             nextLayer = tempNextLayer;
             data.getCallBack().fail();
+        } else {
+            if (data.getResponse() != null) {
+                try {
+                    Constants.setToken(data.getResponse().getString("token"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return data;
     }
