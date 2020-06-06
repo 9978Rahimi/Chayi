@@ -46,39 +46,38 @@ public class PipLine {
         return instance;
     }
 
-    //todo organize methods
-    /*
-    Thread t = new Thread(new Runnable() {
-         @Override
-         public void run() {
-              // Insert some method call here.
-         }
-});
-     */
-
 
     public static void request(String functionName, Class<? extends Chayi> input, boolean single, UserCallBack<?> callBack, Object... args) {
-        PipLine pipLine = getInstance();
-        NetworkLayer layer = pipLine.layers.get(pipLine.layers.size() - 1);
-        NetworkData data = new NetworkData(callBack, RequestType.CUSTOM_POST, input, single);
-        data.setFunctionName(functionName);
-        data.setRequestData(new ArrayList<>(Arrays.asList(args)));
-        layer.lunch(data);
+        Thread t = new Thread(() -> {
+            PipLine pipLine = getInstance();
+            NetworkLayer layer = pipLine.layers.get(pipLine.layers.size() - 1);
+            NetworkData data = new NetworkData(callBack, RequestType.CUSTOM_POST, input, single);
+            data.setFunctionName(functionName);
+            data.setRequestData(new ArrayList<>(Arrays.asList(args)));
+            layer.lunch(data);
+        });
+        t.start();
     }
 
     public static void request(RequestType type, Chayi input, boolean single, UserCallBack<?> callBack, Object... args) {
-        PipLine pipLine = getInstance();
-        NetworkLayer layer = pipLine.layers.get(pipLine.layers.size() - 1);
-        NetworkData data = new NetworkData(callBack, type, input.getClass(), single);
-        data.setId(input.getId());
-        data.setRequestData(new ArrayList<>(Arrays.asList(args)));
-        layer.lunch(data);
+        Thread t = new Thread(() -> {
+            PipLine pipLine = getInstance();
+            NetworkLayer layer = pipLine.layers.get(pipLine.layers.size() - 1);
+            NetworkData data = new NetworkData(callBack, type, input.getClass(), single);
+            data.setId(input.getId());
+            data.setRequestData(new ArrayList<>(Arrays.asList(args)));
+            layer.lunch(data);
+        });
+        t.start();
     }
 
     public static void request(RequestType type, Class<? extends Chayi> input, boolean single, UserCallBack<?> callBack, Object... args) {
-        PipLine pipLine = getInstance();
-        NetworkLayer layer = pipLine.layers.get(pipLine.layers.size() - 1);
-        layer.lunch(new NetworkData(callBack, type, input, single));
+        Thread t = new Thread(() -> {
+            PipLine pipLine = getInstance();
+            NetworkLayer layer = pipLine.layers.get(pipLine.layers.size() - 1);
+            layer.lunch(new NetworkData(callBack, type, input, single));
+        });
+        t.start();
     }
 
     public static boolean isDebug() {

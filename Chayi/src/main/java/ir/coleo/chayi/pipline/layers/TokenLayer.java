@@ -14,6 +14,7 @@ public class TokenLayer extends NetworkLayer {
 
     private NetworkLayer tempNextLayer;
     private boolean tokenFail = false;
+    private static String TAG = TokenLayer.class.getSimpleName();
 
     public TokenLayer(NetworkLayer nextLayer) {
         super(nextLayer);
@@ -71,8 +72,7 @@ public class TokenLayer extends NetworkLayer {
             if (data.getResponse() != null) {
                 try {
                     Constants.setToken(data.getResponse().getString("token"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                } catch (JSONException ignore) {
                 }
             }
         }

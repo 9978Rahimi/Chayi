@@ -1,6 +1,7 @@
 package ir.coleo.alexa;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -38,15 +39,23 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(view -> putName());
         code.setOnClickListener(v -> {
 
-            PipLine.request(RequestType.POST, Citizen.class, false, new UserCallBack<ArrayList<Citizen>>() {
+            PipLine.request(RequestType.POST, Citizen.class, false, new UserCallBack<Citizen>() {
+
                 @Override
                 public void success(ArrayList<Citizen> citizens) {
+                    Log.i(TAG, "success: 1");
+
+                }
+
+                @Override
+                public void success(Citizen arrayList) {
+                    Log.i(TAG, "success: 1");
 
                 }
 
                 @Override
                 public void fail() {
-
+                    Log.i(TAG, "fail: ");
                 }
             });
 
@@ -54,24 +63,38 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void success(Citizen citizen) {
+                    Log.i(TAG, "success: 2");
+                }
 
+                @Override
+                public void success(ArrayList<Citizen> arrayList) {
+                    Log.i(TAG, "success: all2");
                 }
 
                 @Override
                 public void fail() {
-
+                    Log.i(TAG, "fail: 2");
                 }
             }, "09384142925");
 
             Citizen citizen = new Citizen();
             PipLine.request(RequestType.GET, citizen, true, new UserCallBack<Citizen>() {
+
                 @Override
                 public void success(Citizen citizen) {
+                    Log.i(TAG, "success: 3");
+
+                }
+
+                @Override
+                public void success(ArrayList<Citizen> citizens) {
+                    Log.i(TAG, "success: all3");
 
                 }
 
                 @Override
                 public void fail() {
+                    Log.i(TAG, "fail:3 ");
 
                 }
             });

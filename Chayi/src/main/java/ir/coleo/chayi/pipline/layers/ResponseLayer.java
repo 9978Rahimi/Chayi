@@ -46,8 +46,7 @@ public class ResponseLayer extends NetworkLayer {
         try {
             return RetrofitSingleTone.getInstance().getGson()
                     .fromJson(response.get(getObjectName(input)).toString(), (Type) input);
-        } catch (JSONException | NullPointerException e) {
-            e.printStackTrace();
+        } catch (JSONException | NullPointerException ignore) {
         }
         return null;
     }
