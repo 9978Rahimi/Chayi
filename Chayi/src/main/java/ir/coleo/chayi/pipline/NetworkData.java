@@ -6,6 +6,8 @@ import java.util.ArrayList;
 
 import ir.coleo.chayi.Chayi;
 import ir.coleo.chayi.pipline.call_backs.UserCallBack;
+import ir.coleo.chayi.pipline.call_backs.UserCallBackArray;
+import ir.coleo.chayi.pipline.call_backs.UserCallBackSingle;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
@@ -38,15 +40,19 @@ public class NetworkData {
 
     private boolean handled = false;
 
-    public NetworkData(UserCallBack<?> callBack, RequestType requestType, Class<? extends Chayi> input, boolean single) {
+    public NetworkData(UserCallBack<?> callBack, RequestType requestType, Class<? extends Chayi> input) {
         this.callBack = callBack;
+        if (callBack instanceof UserCallBackSingle) {
+            single = true;
+        } else if (callBack instanceof UserCallBackArray) {
+            single = false;
+        }
         this.requestType = requestType;
-        this.single = single;
         this.input = input;
     }
 
-    public NetworkData(UserCallBack<?> callBack, Class<? extends Chayi> input, boolean single) {
-        this(callBack, RequestType.GET, input, single);
+    public NetworkData(UserCallBack<?> callBack, Class<? extends Chayi> input) {
+        this(callBack, RequestType.GET, input);
     }
 
     public boolean isHandled() {

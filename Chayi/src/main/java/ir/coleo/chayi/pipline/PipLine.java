@@ -79,17 +79,17 @@ public class PipLine {
         }
     }
 
-    public static void request(String functionName, Class<? extends Chayi> input, boolean single,
+    public static void request(String functionName, Class<? extends Chayi> input,
                                UserCallBack<?> callBack, Object... args) {
         Thread t = new Thread(() -> {
             if (debug) {
                 if (lockMutual()) {
-                    innerRequest(functionName, input, single, callBack, args);
+                    innerRequest(functionName, input, callBack, args);
                     unlock();
                 }
                 next();
             } else {
-                innerRequest(functionName, input, single, callBack, args);
+                innerRequest(functionName, input, callBack, args);
             }
 
         });
@@ -97,72 +97,72 @@ public class PipLine {
     }
 
     private static void innerRequest(String functionName, Class<? extends Chayi> input,
-                                     boolean single, UserCallBack<?> callBack, Object... args) {
+                                     UserCallBack<?> callBack, Object... args) {
         PipLine pipLine = getInstance();
-        NetworkData data = new NetworkData(callBack, RequestType.CUSTOM_POST, input, single);
+        NetworkData data = new NetworkData(callBack, RequestType.CUSTOM_POST, input);
         data.setFunctionName(functionName);
         data.setRequestData(new ArrayList<>(Arrays.asList(args)));
-        if (debug){
+        if (debug) {
             pipLine.test.lunch(data);
-        }else {
+        } else {
             pipLine.connection.lunch(data);
         }
     }
 
-    public static void request(RequestType type, Chayi input, boolean single,
+    public static void request(RequestType type, Chayi input,
                                UserCallBack<?> callBack, Object... args) {
         Thread t = new Thread(() -> {
             if (debug) {
                 if (lockMutual()) {
-                    innerRequest(type, input, single, callBack, args);
+                    innerRequest(type, input, callBack, args);
                     unlock();
                 }
                 next();
             } else {
-                innerRequest(type, input, single, callBack, args);
+                innerRequest(type, input, callBack, args);
             }
 
         });
         addOrStart(t);
     }
 
-    private static void innerRequest(RequestType type, Chayi input, boolean single,
+    private static void innerRequest(RequestType type, Chayi input,
                                      UserCallBack<?> callBack, Object... args) {
         PipLine pipLine = getInstance();
-        NetworkData data = new NetworkData(callBack, type, input.getClass(), single);
+        NetworkData data = new NetworkData(callBack, type, input.getClass());
         data.setId(input.getId());
         data.setRequestData(new ArrayList<>(Arrays.asList(args)));
-        if (debug){
+        if (debug) {
             pipLine.test.lunch(data);
-        }else {
+        } else {
             pipLine.connection.lunch(data);
         }
     }
 
-    public static void request(RequestType type, Class<? extends Chayi> input, boolean single,
+    public static void request(RequestType type, Class<? extends Chayi> input,
                                UserCallBack<?> callBack, Object... args) {
         Thread t = new Thread(() -> {
             if (debug) {
                 if (lockMutual()) {
-                    innerRequest(type, input, single, callBack, args);
+                    innerRequest(type, input, callBack, args);
                     unlock();
                 }
                 next();
             } else {
-                innerRequest(type, input, single, callBack, args);
+                innerRequest(type, input, callBack, args);
             }
 
         });
         addOrStart(t);
     }
 
-    private static void innerRequest(RequestType type, Class<? extends Chayi> input, boolean single,
+    private static void innerRequest(RequestType type, Class<? extends Chayi> input,
                                      UserCallBack<?> callBack, Object... args) {
         PipLine pipLine = getInstance();
-        if (debug){
-            pipLine.test.lunch(new NetworkData(callBack, type, input, single));
-        }else {
-            pipLine.connection.lunch(new NetworkData(callBack, type, input, single));
+        if (debug) {
+            pipLine.test.lunch(new NetworkData(callBack, type, input));
+        } else {
+            pipLine.connection.lunch(new NetworkData(callBack, type, input));
         }
 
     }
