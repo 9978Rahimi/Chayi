@@ -1,5 +1,7 @@
 package ir.coleo.chayi.pipline.layers;
 
+import android.app.Activity;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -7,9 +9,11 @@ import org.json.JSONObject;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-import ir.coleo.chayi.Chayi;
+import ir.coleo.chayi.constats.Constants;
 import ir.coleo.chayi.constats.RetrofitSingleTone;
 import ir.coleo.chayi.pipline.NetworkData;
+import ir.coleo.chayi.pipline.call_backs.UserCallBackArray;
+import ir.coleo.chayi.pipline.call_backs.UserCallBackSingle;
 
 import static ir.coleo.chayi.pipline.layers.UrlLayer.getObjectName;
 
@@ -24,7 +28,7 @@ public class ResponseLayer extends NetworkLayer {
         return data;
     }
 
-    private static <T extends Chayi> ArrayList<T> multiParse(Class<?> input, JSONObject response) {
+    private static <T> ArrayList<T> multiParse(Class<T> input, JSONObject response) {
         try {
             JSONArray array = response.getJSONArray(UrlLayer.getAllUrl(input));
             ArrayList<T> list = new ArrayList<>();
@@ -38,11 +42,11 @@ public class ResponseLayer extends NetworkLayer {
         return new ArrayList<>();
     }
 
-    private static <T extends Chayi> T singleParse(NetworkData data) {
+    private static <T> T singleParse(NetworkData data) {
         return RetrofitSingleTone.getInstance().getGson().fromJson(data.getResponse().toString(), (Type) data.getInput());
     }
 
-    private static <T extends Chayi> T responseParserPutOrPost(Class<?> input, JSONObject response) {
+    private static <T> T responseParserPutOrPost(Class<?> input, JSONObject response) {
         try {
             return RetrofitSingleTone.getInstance().getGson()
                     .fromJson(response.get(getObjectName(input)).toString(), (Type) input);
@@ -53,21 +57,34 @@ public class ResponseLayer extends NetworkLayer {
 
     @Override
     public NetworkData work(NetworkData data) {
-        switch (data.getRequestType()) {
-            case GET:
-                if (data.isSingle()) {
-                    data.getCallBack().success(singleParse(data));
-                } else {
-                    data.getCallBack().success(multiParse(data.getInput(), data.getResponse()));
+        ((Activity) Constants.context).runOnUiThread(() -> {
+            if (data.isHandled())
+                switch (data.getRequestType()) {
+                    case GET:
+                        if (data.isSingle()) {
+                            if (data.getCallBack() instanceof UserCallBackSingle) {
+                                ((UserCallBackSingle) data.getCallBack()).success(singleParse(data));
+                                data.setHandled(true);
+                            }
+                        } else {
+                            if (data.getCallBack() instanceof UserCallBackArray) {
+                                ((UserCallBackArray) data.getCallBack()).success(multiParse(data.getInput(), data.getResponse()));
+                                data.setHandled(true);
+                            }
+                        }
+                        break;
+                    case PUT:
+                    case POST:
+                    case DELETE:
+                    case CUSTOM_POST:
+                        if (data.getCallBack() instanceof UserCallBackSingle) {
+                            ((UserCallBackSingle) data.getCallBack()).success(responseParserPutOrPost(data.getInput(), data.getResponse()));
+                            data.setHandled(true);
+                        }
+                        break;
                 }
-                break;
-            case PUT:
-            case POST:
-            case DELETE:
-            case CUSTOM_POST:
-                data.getCallBack().success(responseParserPutOrPost(data.getInput(), data.getResponse()));
-                break;
-        }
+        });
+
         return data;
     }
 

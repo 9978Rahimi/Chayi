@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import ir.coleo.chayi.Chayi;
+import ir.coleo.chayi.pipline.call_backs.UserCallBack;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
@@ -35,6 +36,8 @@ public class NetworkData {
     private RequestType requestType;
     private int id;
 
+    private boolean handled = false;
+
     public NetworkData(UserCallBack<?> callBack, RequestType requestType, Class<? extends Chayi> input, boolean single) {
         this.callBack = callBack;
         this.requestType = requestType;
@@ -44,6 +47,14 @@ public class NetworkData {
 
     public NetworkData(UserCallBack<?> callBack, Class<? extends Chayi> input, boolean single) {
         this(callBack, RequestType.GET, input, single);
+    }
+
+    public boolean isHandled() {
+        return !handled;
+    }
+
+    public void setHandled(boolean handled) {
+        this.handled = handled;
     }
 
     public JSONObject getResponse() {

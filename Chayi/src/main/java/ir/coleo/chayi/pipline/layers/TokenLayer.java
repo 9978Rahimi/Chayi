@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import ir.coleo.chayi.constats.Constants;
 import ir.coleo.chayi.pipline.NetworkData;
 import ir.coleo.chayi.pipline.RequestType;
+import ir.coleo.chayi.pipline.call_backs.FailReason;
 
 import static ir.coleo.chayi.constats.Constants.NO_TOKEN;
 
@@ -65,9 +66,10 @@ public class TokenLayer extends NetworkLayer {
 
     @Override
     public NetworkData after(NetworkData data) {
-        if (tokenFail) {
+        if (tokenFail && data.isHandled()) {
+            data.setHandled(true);
             nextLayer = tempNextLayer;
-            data.getCallBack().fail();
+            data.getCallBack().fail(FailReason.Token);
         } else {
             if (data.getResponse() != null) {
                 try {

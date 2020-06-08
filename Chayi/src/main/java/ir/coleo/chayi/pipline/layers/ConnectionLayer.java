@@ -6,6 +6,7 @@ import android.net.NetworkInfo;
 
 import ir.coleo.chayi.constats.Constants;
 import ir.coleo.chayi.pipline.NetworkData;
+import ir.coleo.chayi.pipline.call_backs.FailReason;
 
 public class ConnectionLayer extends NetworkLayer {
 
@@ -40,9 +41,10 @@ public class ConnectionLayer extends NetworkLayer {
 
     @Override
     public NetworkData after(NetworkData data) {
-        if (!isConnected) {
+        if (!isConnected && data.isHandled()) {
+            data.setHandled(true);
             super.nextLayer = tempNextLayer;
-            data.getCallBack().fail();
+            data.getCallBack().fail(FailReason.Network);
         }
         return data;
     }

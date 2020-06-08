@@ -14,6 +14,7 @@ import java.io.IOException;
 import ir.coleo.chayi.constats.Constants;
 import ir.coleo.chayi.constats.RetrofitSingleTone;
 import ir.coleo.chayi.pipline.NetworkData;
+import ir.coleo.chayi.pipline.call_backs.FailReason;
 import ir.coleo.chayi.responseUtil.Error;
 import ir.hatamiarash.toast.RTLToast;
 
@@ -82,9 +83,10 @@ public class HandleErrorLayer extends NetworkLayer {
 
     @Override
     public NetworkData after(NetworkData data) {
-        if (fail) {
+        if (fail && data.isHandled()) {
+            data.setHandled(true);
             nextLayer = tempNetworkLayer;
-            data.getCallBack().fail();
+            data.getCallBack().fail(FailReason.Authentication);
         }
 
         return data;

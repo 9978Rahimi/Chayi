@@ -5,6 +5,7 @@ import java.io.IOException;
 import ir.coleo.chayi.constats.ChayiInterface;
 import ir.coleo.chayi.constats.RetrofitSingleTone;
 import ir.coleo.chayi.pipline.NetworkData;
+import ir.coleo.chayi.pipline.call_backs.FailReason;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -63,9 +64,10 @@ public class RequestLayer extends NetworkLayer {
 
     @Override
     public NetworkData after(NetworkData data) {
-        if (fail) {
+        if (fail && data.isHandled()) {
+            data.setHandled(true);
             nextLayer = tempNextLayer;
-            data.getCallBack().fail();
+            data.getCallBack().fail(FailReason.Request);
         }
         return data;
     }
