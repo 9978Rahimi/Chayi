@@ -8,8 +8,10 @@ import ir.coleo.chayi.Chayi;
 import ir.coleo.chayi.pipline.call_backs.UserCallBack;
 import ir.coleo.chayi.pipline.call_backs.UserCallBackArray;
 import ir.coleo.chayi.pipline.call_backs.UserCallBackSingle;
+import ir.coleo.chayi.pipline.call_backs.UserCallBackSingleStatus;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import retrofit2.Call;
 import retrofit2.Response;
 
 /**
@@ -29,6 +31,7 @@ public class NetworkData {
     private String url;
 
     private RequestBody body;
+    private Call<ResponseBody> call;
 
     private Response<ResponseBody> bodyResponse;
     private JSONObject response;
@@ -42,7 +45,7 @@ public class NetworkData {
 
     public NetworkData(UserCallBack<?> callBack, RequestType requestType, Class<? extends Chayi> input) {
         this.callBack = callBack;
-        if (callBack instanceof UserCallBackSingle) {
+        if (callBack instanceof UserCallBackSingle || callBack instanceof UserCallBackSingleStatus) {
             single = true;
         } else if (callBack instanceof UserCallBackArray) {
             single = false;
@@ -53,6 +56,14 @@ public class NetworkData {
 
     public NetworkData(UserCallBack<?> callBack, Class<? extends Chayi> input) {
         this(callBack, RequestType.GET, input);
+    }
+
+    public Call<ResponseBody> getCall() {
+        return call;
+    }
+
+    public void setCall(Call<ResponseBody> call) {
+        this.call = call;
     }
 
     public boolean isHandled() {

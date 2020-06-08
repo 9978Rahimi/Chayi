@@ -6,6 +6,7 @@ public enum FailReason {
     Token,
     Authentication,
     Request,
-    Server
+    Server,
+    Unknown
 
 }

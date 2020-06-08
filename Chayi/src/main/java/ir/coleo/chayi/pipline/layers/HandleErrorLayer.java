@@ -34,47 +34,52 @@ public class HandleErrorLayer extends NetworkLayer {
 
     @Override
     public NetworkData work(NetworkData data) {
-        int code = data.getBodyResponse().code();
-        if (code >= 100 && code < 400) {
-            fail = false;
-            if (data.getBodyResponse().body() != null) {
-                try {
-                    data.setResponse(new JSONObject(data.getBodyResponse().body().string()));
-                } catch (JSONException | IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        if (data.getBodyResponse() == null) {
+            data.getCallBack().fail(FailReason.Server);
+            data.setHandled(true);
         } else {
-            fail = true;
-            tempNetworkLayer = nextLayer;
-            nextLayer = null;
-            Error error = null;
-            if (data.getBodyResponse().errorBody() != null) {
-                try {
-                    error = RetrofitSingleTone
-                            .getInstance()
-                            .getGson()
-                            .fromJson(data.getBodyResponse().errorBody().string(), Error.class);
-                } catch (IOException | JsonSyntaxException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (error != null) {
-                if (code == 403) {
-                    if (TokenLayer.haveToken()) {
-                        Error finalError = error;
-                        ((Activity) Constants.context).runOnUiThread(() -> {
-                            RTLToast.error(Constants.context, finalError.getErrors(), Toast.LENGTH_LONG).show();
-                            Constants.setToken(Constants.NO_TOKEN);
-                            Intent intent = new Intent(Constants.context, Constants.getRestartActivity());
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            Constants.context.startActivity(intent);
-                            ((Activity) Constants.context).finish();
-                        });
-
+            int code = data.getBodyResponse().code();
+            if (code >= 100 && code < 400) {
+                fail = false;
+                if (data.getBodyResponse().body() != null) {
+                    try {
+                        data.setResponse(new JSONObject(data.getBodyResponse().body().string()));
+                    } catch (JSONException | IOException e) {
+                        e.printStackTrace();
                     }
-                } else {
-                    RTLToast.error(Constants.context, error.getErrors(), Toast.LENGTH_LONG).show();
+                }
+            } else {
+                fail = true;
+                tempNetworkLayer = nextLayer;
+                nextLayer = null;
+                Error error = null;
+                if (data.getBodyResponse().errorBody() != null) {
+                    try {
+                        error = RetrofitSingleTone
+                                .getInstance()
+                                .getGson()
+                                .fromJson(data.getBodyResponse().errorBody().string(), Error.class);
+                    } catch (IOException | JsonSyntaxException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (error != null) {
+                    if (code == 403) {
+                        if (TokenLayer.haveToken()) {
+                            Error finalError = error;
+                            ((Activity) Constants.context).runOnUiThread(() -> {
+                                RTLToast.error(Constants.context, finalError.getErrors(), Toast.LENGTH_LONG).show();
+                                Constants.setToken(Constants.NO_TOKEN);
+                                Intent intent = new Intent(Constants.context, Constants.getRestartActivity());
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                Constants.context.startActivity(intent);
+                                ((Activity) Constants.context).finish();
+                            });
+
+                        }
+                    } else {
+                        RTLToast.error(Constants.context, error.getErrors(), Toast.LENGTH_LONG).show();
+                    }
                 }
             }
         }

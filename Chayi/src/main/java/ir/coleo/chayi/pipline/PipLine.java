@@ -79,6 +79,23 @@ public class PipLine {
         }
     }
 
+    public static void request(String functionName, Chayi chayi,
+                               UserCallBack<?> callBack, Object... args) {
+        Thread t = new Thread(() -> {
+            if (debug) {
+                if (lockMutual()) {
+                    innerRequest(functionName, chayi, callBack, args);
+                    unlock();
+                }
+                next();
+            } else {
+                innerRequest(functionName, chayi, callBack, args);
+            }
+
+        });
+        addOrStart(t);
+    }
+
     public static void request(String functionName, Class<? extends Chayi> input,
                                UserCallBack<?> callBack, Object... args) {
         Thread t = new Thread(() -> {
@@ -94,6 +111,19 @@ public class PipLine {
 
         });
         addOrStart(t);
+    }
+
+    private static void innerRequest(String functionName, Chayi input,
+                                     UserCallBack<?> callBack, Object... args) {
+        PipLine pipLine = getInstance();
+        NetworkData data = new NetworkData(callBack, RequestType.CUSTOM_POST, input.getClass());
+        data.setFunctionName(functionName);
+        data.setRequestData(new ArrayList<>(Arrays.asList(args)));
+        if (debug) {
+            pipLine.test.lunch(data);
+        } else {
+            pipLine.connection.lunch(data);
+        }
     }
 
     private static void innerRequest(String functionName, Class<? extends Chayi> input,

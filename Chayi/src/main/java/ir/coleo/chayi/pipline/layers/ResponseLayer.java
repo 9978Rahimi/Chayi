@@ -12,8 +12,10 @@ import java.util.ArrayList;
 import ir.coleo.chayi.constats.Constants;
 import ir.coleo.chayi.constats.RetrofitSingleTone;
 import ir.coleo.chayi.pipline.NetworkData;
+import ir.coleo.chayi.pipline.call_backs.FailReason;
 import ir.coleo.chayi.pipline.call_backs.UserCallBackArray;
 import ir.coleo.chayi.pipline.call_backs.UserCallBackSingle;
+import ir.coleo.chayi.pipline.call_backs.UserCallBackSingleStatus;
 
 import static ir.coleo.chayi.pipline.layers.UrlLayer.getObjectName;
 
@@ -43,7 +45,11 @@ public class ResponseLayer extends NetworkLayer {
     }
 
     private static <T> T singleParse(NetworkData data) {
-        return RetrofitSingleTone.getInstance().getGson().fromJson(data.getResponse().toString(), (Type) data.getInput());
+        try {
+            return RetrofitSingleTone.getInstance().getGson().fromJson(data.getResponse().getJSONObject(getObjectName(data.getInput())).toString(), (Type) data.getInput());
+        } catch (JSONException ignore) {
+        }
+        return null;
     }
 
     private static <T> T responseParserPutOrPost(Class<?> input, JSONObject response) {
@@ -65,6 +71,9 @@ public class ResponseLayer extends NetworkLayer {
                             if (data.getCallBack() instanceof UserCallBackSingle) {
                                 ((UserCallBackSingle) data.getCallBack()).success(singleParse(data));
                                 data.setHandled(true);
+                            } else if (data.getCallBack() instanceof UserCallBackSingleStatus) {
+                                ((UserCallBackSingleStatus) data.getCallBack()).success(singleParse(data), data.getBodyResponse().code());
+                                data.setHandled(true);
                             }
                         } else {
                             if (data.getCallBack() instanceof UserCallBackArray) {
@@ -77,12 +86,25 @@ public class ResponseLayer extends NetworkLayer {
                     case POST:
                     case DELETE:
                     case CUSTOM_POST:
-                        if (data.getCallBack() instanceof UserCallBackSingle) {
-                            ((UserCallBackSingle) data.getCallBack()).success(responseParserPutOrPost(data.getInput(), data.getResponse()));
-                            data.setHandled(true);
+                        if (data.isSingle()) {
+                            if (data.getCallBack() instanceof UserCallBackSingle) {
+                                ((UserCallBackSingle) data.getCallBack()).success(responseParserPutOrPost(data.getInput(), data.getResponse()));
+                                data.setHandled(true);
+                            } else if (data.getCallBack() instanceof UserCallBackSingleStatus) {
+                                ((UserCallBackSingleStatus) data.getCallBack()).success(responseParserPutOrPost(data.getInput(), data.getResponse()), data.getBodyResponse().code());
+                                data.setHandled(true);
+                            }
+                        } else {
+                            if (data.getCallBack() instanceof UserCallBackArray) {
+                                ((UserCallBackArray) data.getCallBack()).success(multiParse(data.getInput(), data.getResponse()));
+                                data.setHandled(true);
+                            }
                         }
                         break;
                 }
+            if (data.isHandled()) {
+                data.getCallBack().fail(FailReason.Unknown);
+            }
         });
 
         return data;
