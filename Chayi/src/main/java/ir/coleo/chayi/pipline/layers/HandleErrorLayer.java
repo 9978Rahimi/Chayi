@@ -78,7 +78,8 @@ public class HandleErrorLayer extends NetworkLayer {
 
                         }
                     } else {
-                        RTLToast.error(Constants.context, error.getErrors(), Toast.LENGTH_LONG).show();
+                        Error finalError1 = error;
+                        ((Activity) Constants.context).runOnUiThread(() -> RTLToast.error(Constants.context, finalError1.getErrors(), Toast.LENGTH_LONG).show());
                     }
                 }
             }
@@ -93,7 +94,6 @@ public class HandleErrorLayer extends NetworkLayer {
             nextLayer = tempNetworkLayer;
             data.getCallBack().fail(FailReason.Authentication);
         }
-
         return data;
     }
 }

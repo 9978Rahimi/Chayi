@@ -117,6 +117,7 @@ public class PipLine {
                                      UserCallBack<?> callBack, Object... args) {
         PipLine pipLine = getInstance();
         NetworkData data = new NetworkData(callBack, RequestType.CUSTOM_POST, input.getClass());
+        data.setId(input.getId());
         data.setFunctionName(functionName);
         data.setRequestData(new ArrayList<>(Arrays.asList(args)));
         if (debug) {
@@ -189,10 +190,12 @@ public class PipLine {
     private static void innerRequest(RequestType type, Class<? extends Chayi> input,
                                      UserCallBack<?> callBack, Object... args) {
         PipLine pipLine = getInstance();
+        NetworkData data = new NetworkData(callBack, type, input);
+        data.setRequestData(new ArrayList<>(Arrays.asList(args)));
         if (debug) {
-            pipLine.test.lunch(new NetworkData(callBack, type, input));
+            pipLine.test.lunch(data);
         } else {
-            pipLine.connection.lunch(new NetworkData(callBack, type, input));
+            pipLine.connection.lunch(data);
         }
 
     }
