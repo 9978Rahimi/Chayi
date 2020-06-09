@@ -7,14 +7,12 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.ArrayList;
-
 import ir.coleo.alexa.models.Citizen;
 import ir.coleo.alexa.models.android.HistoryRequest;
 import ir.coleo.chayi.constats.Constants;
 import ir.coleo.chayi.pipline.PipLine;
-import ir.coleo.chayi.pipline.RequestType;
-import ir.coleo.chayi.pipline.UserCallBack;
+import ir.coleo.chayi.pipline.call_backs.FailReason;
+import ir.coleo.chayi.pipline.call_backs.UserCallBackSingle;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,145 +21,47 @@ public class MainActivity extends AppCompatActivity {
     private Button code;
     private HistoryRequest request;
 
-//    Citizen citizen = new Citizen("09384142925");
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Constants.setBase_url("https://dev.zimaapp.ir/api/av1/");
-        Constants.context = getApplicationContext();
+        Constants.setBase_url("https://dev0.zimaapp.ir/api/av1/");
+        Constants.context = this;
+        PipLine.setDebug(false);
 
-        textView = findViewById(R.id.textView);
-        button = findViewById(R.id.button);
-        code = findViewById(R.id.code_button);
+        textView = findViewById(R.id.phone_textView);
+        code = findViewById(R.id.phone_button);
 
-        button.setOnClickListener(view -> putName());
         code.setOnClickListener(v -> {
 
-            PipLine.request(RequestType.POST, Citizen.class, false, new UserCallBack<Citizen>() {
-
-                @Override
-                public void success(ArrayList<Citizen> citizens) {
-                    Log.i(TAG, "success: 1");
-
-                }
-
-                @Override
-                public void success(Citizen arrayList) {
-                    Log.i(TAG, "success: 1");
-
-                }
-
-                @Override
-                public void fail() {
-                    Log.i(TAG, "fail: ");
-                }
-            });
-
-            PipLine.request("app_enter", Citizen.class, true, new UserCallBack<Citizen>() {
-
-                @Override
-                public void success(Citizen citizen) {
-                    Log.i(TAG, "success: 2");
-                }
-
-                @Override
-                public void success(ArrayList<Citizen> arrayList) {
-                    Log.i(TAG, "success: all2");
-                }
-
-                @Override
-                public void fail() {
-                    Log.i(TAG, "fail: 2");
-                }
-            }, "09384142925");
-
-            Citizen citizen = new Citizen();
-            PipLine.request(RequestType.GET, citizen, true, new UserCallBack<Citizen>() {
-
-                @Override
-                public void success(Citizen citizen) {
-                    Log.i(TAG, "success: 3");
-
-                }
-
-                @Override
-                public void success(ArrayList<Citizen> citizens) {
-                    Log.i(TAG, "success: all3");
-
-                }
-
-                @Override
-                public void fail() {
-                    Log.i(TAG, "fail:3 ");
-
-                }
-            });
-
-//            request = new HistoryRequest(25);
-//            Chayi.customPostRequest(new SingleChayiCallBackOne<HistoryRequest>() {
+//            Intent intent = new Intent(getApplication(), MainActivity2.class);
+//            intent.putExtra("phone", textView.getText().toString());
+//            startActivity(intent);
 //
-//                @Override
-//                public void onResponse(HistoryRequest historyRequest) {
-//                    Log.i("TAG", "onResponse: finish");
-//                }
-//
-//                @Override
-//                public void fail(String errorMassage) {
-//                    Log.i("TAG", "fail: finish");
-//                }
-//            }, "driver_weighting", request, new ArrayList<>());
+            for (int i = 0; i < 1000; i++) {
+                final long start = System.currentTimeMillis();
+                Log.i(TAG, "onCreate: start Time number " + i + " " + start);
+                int finalI = i;
+                PipLine.request("app_enter", Citizen.class, new UserCallBackSingle<Citizen>() {
 
-//            Retrofit retrofit =
-//                    new Retrofit.Builder()
-//                            .baseUrl("http://httpbin.org")
-//                            .addCallAdapterFactory(new ErrorHandlingAdapter.ErrorHandlingCallAdapterFactory())
-//                            .addConverterFactory(GsonConverterFactory.create())
-//                            .build();
-//
-//            ErrorHandlingAdapter.HttpBinService service = retrofit.create(ErrorHandlingAdapter.HttpBinService.class);
-//            ErrorHandlingAdapter.MyCall<ErrorHandlingAdapter.Ip> ip = service.getIp();
-//            ip.enqueue(
-//                    new ErrorHandlingAdapter.MyCallback<ErrorHandlingAdapter.Ip>() {
-//                        @Override
-//                        public void success(Response<ErrorHandlingAdapter.Ip> response) {
-//                            System.out.println("SUCCESS! " + response.body().origin);
-//                        }
-//
-//                        @Override
-//                        public void unauthenticated(Response<?> response) {
-//                            System.out.println("UNAUTHENTICATED");
-//                        }
-//
-//                        @Override
-//                        public void clientError(Response<?> response) {
-//                            System.out.println("CLIENT ERROR " + response.code() + " " + response.message());
-//                        }
-//
-//                        @Override
-//                        public void serverError(Response<?> response) {
-//                            System.out.println("SERVER ERROR " + response.code() + " " + response.message());
-//                        }
-//
-//                        @Override
-//                        public void networkError(IOException e) {
-//                            System.err.println("NETWORK ERROR " + e.getMessage());
-//                        }
-//
-//                        @Override
-//                        public void unexpectedError(Throwable t) {
-//                            System.err.println("FATAL ERROR " + t.getMessage());
-//                        }
-//                    });
+                    @Override
+                    public void fail(FailReason reason) {
+
+                    }
+
+                    @Override
+                    public void success(Citizen citizen) {
+                        Log.i(TAG, "onCreate: start Time number " + finalI + " toke " + (System.currentTimeMillis() - start));
+                    }
+
+                }, textView.getText().toString());
+
+            }
+
         });
     }
 
     private static String TAG = "TAG";
-
-    public void putName() {
-
-    }
 
 
 }
