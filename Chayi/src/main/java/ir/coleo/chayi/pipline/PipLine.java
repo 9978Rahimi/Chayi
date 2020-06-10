@@ -1,5 +1,7 @@
 package ir.coleo.chayi.pipline;
 
+import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -7,14 +9,16 @@ import androidx.annotation.VisibleForTesting;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Queue;
 
 import ir.coleo.chayi.Chayi;
+import ir.coleo.chayi.pipline.call_backs.FailReason;
 import ir.coleo.chayi.pipline.call_backs.UserCallBack;
 import ir.coleo.chayi.pipline.layers.ConnectionLayer;
+import ir.coleo.chayi.pipline.layers.DisablerLayer;
 import ir.coleo.chayi.pipline.layers.HandleErrorLayer;
 import ir.coleo.chayi.pipline.layers.JsonLayer;
-import ir.coleo.chayi.pipline.layers.LoadingLayer;
 import ir.coleo.chayi.pipline.layers.NetworkLayer;
 import ir.coleo.chayi.pipline.layers.RequestLayer;
 import ir.coleo.chayi.pipline.layers.ResponseLayer;
@@ -34,7 +38,7 @@ public class PipLine {
     @Nullable
     private static SimpleIdlingResource mIdlingResource;
 
-    private NetworkLayer loading;
+    private NetworkLayer disabler;
     private NetworkLayer connection;
     private NetworkLayer test;
 
@@ -51,9 +55,9 @@ public class PipLine {
         layers.add(new UrlLayer(layers.get(layers.size() - 1)));
         layers.add(new TokenLayer(layers.get(layers.size() - 1)));
         connection = new ConnectionLayer(layers.get(layers.size() - 1));
-        loading = new LoadingLayer(connection);
+        disabler = new DisablerLayer(connection);
         layers.add(connection);
-        layers.add(loading);
+        layers.add(disabler);
         if (debug) {
             test = new TestLayer(connection, getIdlingResource());
             layers.add(test);
@@ -79,65 +83,20 @@ public class PipLine {
         }
     }
 
-    public static void request(String functionName, Chayi chayi,
-                               UserCallBack<?> callBack, Object... args) {
+    public static void requestDisable(RequestType type, Chayi input,
+                                      UserCallBack<?> callBack, View view, Object... args) {
         Thread t = new Thread(() -> {
             if (debug) {
                 if (lockMutual()) {
-                    innerRequest(functionName, chayi, callBack, args);
+                    innerRequest(type, input, callBack, view, args);
                     unlock();
                 }
                 next();
             } else {
-                innerRequest(functionName, chayi, callBack, args);
+                innerRequest(type, input, callBack, view, args);
             }
-
         });
         addOrStart(t);
-    }
-
-    public static void request(String functionName, Class<? extends Chayi> input,
-                               UserCallBack<?> callBack, Object... args) {
-        Thread t = new Thread(() -> {
-            if (debug) {
-                if (lockMutual()) {
-                    innerRequest(functionName, input, callBack, args);
-                    unlock();
-                }
-                next();
-            } else {
-                innerRequest(functionName, input, callBack, args);
-            }
-
-        });
-        addOrStart(t);
-    }
-
-    private static void innerRequest(String functionName, Chayi input,
-                                     UserCallBack<?> callBack, Object... args) {
-        PipLine pipLine = getInstance();
-        NetworkData data = new NetworkData(callBack, RequestType.CUSTOM_POST, input.getClass());
-        data.setId(input.getId());
-        data.setFunctionName(functionName);
-        data.setRequestData(new ArrayList<>(Arrays.asList(args)));
-        if (debug) {
-            pipLine.test.lunch(data);
-        } else {
-            pipLine.connection.lunch(data);
-        }
-    }
-
-    private static void innerRequest(String functionName, Class<? extends Chayi> input,
-                                     UserCallBack<?> callBack, Object... args) {
-        PipLine pipLine = getInstance();
-        NetworkData data = new NetworkData(callBack, RequestType.CUSTOM_POST, input);
-        data.setFunctionName(functionName);
-        data.setRequestData(new ArrayList<>(Arrays.asList(args)));
-        if (debug) {
-            pipLine.test.lunch(data);
-        } else {
-            pipLine.connection.lunch(data);
-        }
     }
 
     public static void request(RequestType type, Chayi input,
@@ -145,12 +104,12 @@ public class PipLine {
         Thread t = new Thread(() -> {
             if (debug) {
                 if (lockMutual()) {
-                    innerRequest(type, input, callBack, args);
+                    innerRequest(type, input, callBack, null, args);
                     unlock();
                 }
                 next();
             } else {
-                innerRequest(type, input, callBack, args);
+                innerRequest(type, input, callBack, null, args);
             }
 
         });
@@ -158,29 +117,67 @@ public class PipLine {
     }
 
     private static void innerRequest(RequestType type, Chayi input,
-                                     UserCallBack<?> callBack, Object... args) {
+                                     UserCallBack<?> callBack, View view, Object... args) {
         PipLine pipLine = getInstance();
         NetworkData data = new NetworkData(callBack, type, input.getClass());
         data.setId(input.getId());
-        data.setRequestData(new ArrayList<>(Arrays.asList(args)));
+        ArrayList<Object> dataUser = new ArrayList<>(Arrays.asList(args));
+        boolean loading = view != null;
+        if (loading) {
+            data.setView(view);
+        }
+        if (type == RequestType.CUSTOM_POST) {
+            if (args[0] != null && args[0] instanceof String) {
+                data.setFunctionName((String) args[0]);
+                dataUser.remove(0);
+                data.setRequestData(dataUser);
+            } else {
+                data.setHandled(true);
+                callBack.fail(FailReason.Function_Name_Costume_Request);
+                return;
+            }
+        } else {
+            data.setRequestData(dataUser);
+        }
         if (debug) {
             pipLine.test.lunch(data);
         } else {
-            pipLine.connection.lunch(data);
+            if (loading) {
+                pipLine.disabler.lunch(data);
+            } else
+                pipLine.connection.lunch(data);
         }
     }
+
+    public static void requestDisable(RequestType type, Class<? extends Chayi> input,
+                                      UserCallBack<?> callBack, View view, Object... args) {
+        Thread t = new Thread(() -> {
+            if (debug) {
+                if (lockMutual()) {
+                    innerRequest(type, input, callBack, view, args);
+                    unlock();
+                }
+                next();
+            } else {
+                innerRequest(type, input, callBack, view, args);
+            }
+
+        });
+        addOrStart(t);
+    }
+
 
     public static void request(RequestType type, Class<? extends Chayi> input,
                                UserCallBack<?> callBack, Object... args) {
         Thread t = new Thread(() -> {
             if (debug) {
                 if (lockMutual()) {
-                    innerRequest(type, input, callBack, args);
+                    innerRequest(type, input, callBack, null, args);
                     unlock();
                 }
                 next();
             } else {
-                innerRequest(type, input, callBack, args);
+                innerRequest(type, input, callBack, null, args);
             }
 
         });
@@ -188,21 +185,41 @@ public class PipLine {
     }
 
     private static void innerRequest(RequestType type, Class<? extends Chayi> input,
-                                     UserCallBack<?> callBack, Object... args) {
+                                     UserCallBack<?> callBack, View view, Object... args) {
         PipLine pipLine = getInstance();
         NetworkData data = new NetworkData(callBack, type, input);
-        data.setRequestData(new ArrayList<>(Arrays.asList(args)));
+        ArrayList<Object> dataUser = new ArrayList<>(Arrays.asList(args));
+        boolean loading = view != null;
+        if (loading) {
+            data.setView(view);
+        }
+        if (type == RequestType.CUSTOM_POST) {
+            if (args[0] != null && args[0] instanceof String) {
+                data.setFunctionName((String) args[0]);
+                dataUser.remove(0);
+                data.setRequestData(dataUser);
+            } else {
+                data.setHandled(true);
+                callBack.fail(FailReason.Function_Name_Costume_Request);
+                return;
+            }
+        } else {
+            data.setRequestData(dataUser);
+        }
         if (debug) {
             pipLine.test.lunch(data);
         } else {
-            pipLine.connection.lunch(data);
+            if (loading) {
+                pipLine.disabler.lunch(data);
+            } else
+                pipLine.connection.lunch(data);
         }
 
     }
 
     private static void next() {
         if (!debugThreads.isEmpty()) {
-            debugThreads.poll().start();
+            Objects.requireNonNull(debugThreads.poll()).start();
         }
     }
 

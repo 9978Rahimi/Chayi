@@ -10,6 +10,8 @@ import okhttp3.RequestBody;
 
 public class JsonLayer extends NetworkLayer {
 
+    private String TAG = getClass().getSimpleName();
+
     public JsonLayer(NetworkLayer nextLayer) {
         super(nextLayer);
     }

@@ -10,8 +10,8 @@ import ir.coleo.chayi.pipline.call_backs.FailReason;
 
 public class ConnectionLayer extends NetworkLayer {
 
-    private boolean isConnected = false;
     private NetworkLayer tempNextLayer;
+    private String TAG = getClass().getSimpleName();
 
     public ConnectionLayer(NetworkLayer nextLayer) {
         super(nextLayer);
@@ -26,13 +26,13 @@ public class ConnectionLayer extends NetworkLayer {
 
     @Override
     public NetworkData before(NetworkData data) {
-        isConnected = isNetworkAvailable();
+        data.addResult(TAG, isNetworkAvailable());
         return data;
     }
 
     @Override
     public NetworkData work(NetworkData data) {
-        if (!isConnected) {
+        if (!data.getResult(TAG)) {
             tempNextLayer = super.nextLayer;
             super.nextLayer = null;
         }
@@ -41,7 +41,7 @@ public class ConnectionLayer extends NetworkLayer {
 
     @Override
     public NetworkData after(NetworkData data) {
-        if (!isConnected && data.isHandled()) {
+        if (!data.getResult(TAG) && data.isHandled()) {
             data.setHandled(true);
             super.nextLayer = tempNextLayer;
             data.getCallBack().fail(FailReason.Network);

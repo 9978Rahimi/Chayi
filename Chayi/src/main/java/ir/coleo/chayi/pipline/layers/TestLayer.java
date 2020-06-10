@@ -10,7 +10,8 @@ import ir.coleo.chayi.pipline.SimpleIdlingResource;
 public class TestLayer extends NetworkLayer {
 
 
-    private static String TAG = TestLayer.class.getSimpleName();
+    private String TAG = getClass().getSimpleName();
+
     @NonNull
     private final SimpleIdlingResource mIdlingResource;
 

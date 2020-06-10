@@ -7,6 +7,7 @@ public enum FailReason {
     Authentication,
     Request,
     Server,
-    Unknown
+    Unknown,
+    Function_Name_Costume_Request
 
 }

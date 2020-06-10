@@ -1,5 +1,7 @@
 package ir.coleo.chayi.pipline.layers;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayDeque;
 import java.util.Queue;
 
@@ -15,8 +17,7 @@ import retrofit2.Response;
 public class RequestLayer extends NetworkLayer {
 
     private NetworkLayer tempNextLayer;
-    private boolean fail = false;
-    private static String TAG = RequestLayer.class.getSimpleName();
+    private String TAG = getClass().getSimpleName();
     private static boolean canWork = true;
     private Queue<Lock> locks = new ArrayDeque<>();
 
@@ -53,7 +54,6 @@ public class RequestLayer extends NetworkLayer {
         return data;
     }
 
-
     @Override
     public NetworkData work(NetworkData data) {
 
@@ -61,19 +61,19 @@ public class RequestLayer extends NetworkLayer {
 
         data.getCall().enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(@NotNull Call<ResponseBody> call, @NotNull Response<ResponseBody> response) {
                 data.setBodyResponse(response);
-                fail = false;
+                data.addResult(TAG, false);
                 synchronized (lock) {
                     lock.notify();
                 }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(@NotNull Call<ResponseBody> call, @NotNull Throwable t) {
                 tempNextLayer = nextLayer;
                 nextLayer = null;
-                fail = true;
+                data.addResult(TAG, true);
                 synchronized (lock) {
                     lock.notify();
                 }
@@ -94,7 +94,7 @@ public class RequestLayer extends NetworkLayer {
 
     @Override
     public NetworkData after(NetworkData data) {
-        if (fail && data.isHandled()) {
+        if (data.getResult(TAG) && data.isHandled()) {
             data.setHandled(true);
             nextLayer = tempNextLayer;
             data.getCallBack().fail(FailReason.Request);

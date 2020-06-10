@@ -10,6 +10,8 @@ import ir.coleo.chayi.pipline.RequestType;
 
 public class UrlLayer extends NetworkLayer {
 
+    private String TAG = getClass().getSimpleName();
+
     public UrlLayer(NetworkLayer nextLayer) {
         super(nextLayer);
     }

@@ -14,8 +14,8 @@ import static ir.coleo.chayi.constats.Constants.NO_TOKEN;
 public class TokenLayer extends NetworkLayer {
 
     private NetworkLayer tempNextLayer;
-    private boolean tokenFail = false;
-    private static String TAG = TokenLayer.class.getSimpleName();
+    private String TAG = getClass().getSimpleName();
+
 
     public TokenLayer(NetworkLayer nextLayer) {
         super(nextLayer);
@@ -53,20 +53,22 @@ public class TokenLayer extends NetworkLayer {
         if (data.isNeedToken()) {
             String token = Constants.getToken();
             if (token.equalsIgnoreCase("Token " + NO_TOKEN)) {
-                tokenFail = true;
+                data.addResult(TAG, true);
                 tempNextLayer = nextLayer;
                 nextLayer = null;
             } else {
-                tokenFail = false;
+                data.addResult(TAG, false);
                 data.setToken(token);
             }
+        } else {
+            data.addResult(TAG, false);
         }
         return data;
     }
 
     @Override
     public NetworkData after(NetworkData data) {
-        if (tokenFail && data.isHandled()) {
+        if (data.getResult(TAG) && data.isHandled()) {
             data.setHandled(true);
             nextLayer = tempNextLayer;
             data.getCallBack().fail(FailReason.Token);

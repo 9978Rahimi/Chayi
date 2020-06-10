@@ -1,8 +1,11 @@
 package ir.coleo.chayi.pipline;
 
+import android.view.View;
+
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import ir.coleo.chayi.Chayi;
 import ir.coleo.chayi.pipline.call_backs.UserCallBack;
@@ -41,7 +44,10 @@ public class NetworkData {
     private RequestType requestType;
     private int id;
 
+    private HashMap<String, Boolean> layerResult = new HashMap<>();
+
     private boolean handled = false;
+    private View view;
 
     public NetworkData(UserCallBack<?> callBack, RequestType requestType, Class<? extends Chayi> input) {
         this.callBack = callBack;
@@ -56,6 +62,22 @@ public class NetworkData {
 
     public NetworkData(UserCallBack<?> callBack, Class<? extends Chayi> input) {
         this(callBack, RequestType.GET, input);
+    }
+
+    public void addResult(String key, Boolean value) {
+        layerResult.put(key, value);
+    }
+
+    public Boolean getResult(String key) {
+        return layerResult.get(key);
+    }
+
+    public View getView() {
+        return view;
+    }
+
+    public void setView(View view) {
+        this.view = view;
     }
 
     public Call<ResponseBody> getCall() {

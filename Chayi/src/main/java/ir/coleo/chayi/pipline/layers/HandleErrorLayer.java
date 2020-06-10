@@ -21,7 +21,7 @@ import ir.hatamiarash.toast.RTLToast;
 public class HandleErrorLayer extends NetworkLayer {
 
     private NetworkLayer tempNetworkLayer;
-    private boolean fail = false;
+    private String TAG = getClass().getSimpleName();
 
     public HandleErrorLayer(NetworkLayer nextLayer) {
         super(nextLayer);
@@ -40,7 +40,7 @@ public class HandleErrorLayer extends NetworkLayer {
         } else {
             int code = data.getBodyResponse().code();
             if (code >= 100 && code < 400) {
-                fail = false;
+                data.addResult(TAG, false);
                 if (data.getBodyResponse().body() != null) {
                     try {
                         data.setResponse(new JSONObject(data.getBodyResponse().body().string()));
@@ -49,7 +49,7 @@ public class HandleErrorLayer extends NetworkLayer {
                     }
                 }
             } else {
-                fail = true;
+                data.addResult(TAG, true);
                 tempNetworkLayer = nextLayer;
                 nextLayer = null;
                 Error error = null;
@@ -89,7 +89,7 @@ public class HandleErrorLayer extends NetworkLayer {
 
     @Override
     public NetworkData after(NetworkData data) {
-        if (fail && data.isHandled()) {
+        if (data.getResult(TAG) && data.isHandled()) {
             data.setHandled(true);
             nextLayer = tempNetworkLayer;
             data.getCallBack().fail(FailReason.Authentication);
