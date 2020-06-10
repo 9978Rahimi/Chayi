@@ -34,6 +34,7 @@ public class DisablerLayer extends NetworkLayer {
         if (data.getResult(TAG)) {
             ((Activity) Constants.context).runOnUiThread(() -> data.getView().setClickable(true));
         }
+        data.setView(null);
         return data;
     }
 }
