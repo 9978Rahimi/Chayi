@@ -6,6 +6,7 @@ import android.widget.EditText;
 
 import ir.coleo.alexa.models.Citizen;
 import ir.coleo.chayi.pipline.PipLine;
+import ir.coleo.chayi.pipline.RequestType;
 import ir.coleo.chayi.pipline.SimpleIdlingResource;
 import ir.coleo.chayi.pipline.call_backs.FailReason;
 import ir.coleo.chayi.pipline.call_backs.UserCallBackSingle;
@@ -31,7 +32,7 @@ public class MainActivity2 extends TestActivity {
 
 
     public void putName(String phone) {
-        PipLine.request("app_check_code", Citizen.class, new UserCallBackSingle<Citizen>() {
+        PipLine.request(RequestType.CUSTOM_POST, Citizen.class, new UserCallBackSingle<Citizen>() {
             @Override
             public void success(Citizen citizen) {
                 mIdlingResource.setIdleState(true);
@@ -41,7 +42,7 @@ public class MainActivity2 extends TestActivity {
             public void fail(FailReason reason) {
                 ((SimpleIdlingResource) getIdlingResource()).setIdleState(true);
             }
-        }, phone, codeInput.getText().toString(), "");
+        }, "app_check_code", phone, codeInput.getText().toString(), "");
     }
 
 
