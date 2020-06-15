@@ -1,8 +1,8 @@
 package ir.coleo.chayi.pipline.layers;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import ir.coleo.chayi.pipline.NetworkData;
 import ir.coleo.chayi.pipline.SimpleIdlingResource;
@@ -11,9 +11,9 @@ public class TestLayer extends NetworkLayer {
 
 
     private String TAG = getClass().getSimpleName();
-
     @NonNull
     private final SimpleIdlingResource mIdlingResource;
+    private AtomicInteger count = new AtomicInteger(0);
 
     public TestLayer(NetworkLayer nextLayer, @NonNull SimpleIdlingResource mIdlingResource) {
         super(nextLayer);
@@ -22,21 +22,20 @@ public class TestLayer extends NetworkLayer {
 
     @Override
     public NetworkData before(NetworkData data) {
-        Log.i(TAG, "before: ");
-        mIdlingResource.setIdleState(false);
+        if (count.getAndAdd(1) == 0)
+            mIdlingResource.setIdleState(false);
         return data;
     }
 
     @Override
     public NetworkData work(NetworkData data) {
-        Log.i(TAG, "work: ");
         return data;
     }
 
     @Override
     public NetworkData after(NetworkData data) {
-        Log.i(TAG, "after: ");
-        mIdlingResource.setIdleState(true);
+        if (count.getAndAdd(-1) == 1)
+            mIdlingResource.setIdleState(true);
         return data;
     }
 

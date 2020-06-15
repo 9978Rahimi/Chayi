@@ -75,7 +75,9 @@ public class HandleErrorLayer extends NetworkLayer {
                                 Constants.context.startActivity(intent);
                                 ((Activity) Constants.context).finish();
                             });
-
+                        }else{
+                            Error finalError1 = error;
+                            ((Activity) Constants.context).runOnUiThread(() -> RTLToast.error(Constants.context, finalError1.getErrors(), Toast.LENGTH_LONG).show());
                         }
                     } else {
                         Error finalError1 = error;

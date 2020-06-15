@@ -59,7 +59,7 @@ public class PipLine {
         layers.add(connection);
         layers.add(disabler);
         if (debug) {
-            test = new TestLayer(connection, getIdlingResource());
+            test = new TestLayer(disabler, getIdlingResource());
             layers.add(test);
         }
     }
@@ -86,34 +86,17 @@ public class PipLine {
     public static void requestDisable(RequestType type, Chayi input,
                                       UserCallBack<?> callBack, View view, Object... args) {
         Thread t = new Thread(() -> {
-            if (debug) {
-                if (lockMutual()) {
-                    innerRequest(type, input, callBack, view, args);
-                    unlock();
-                }
-                next();
-            } else {
-                innerRequest(type, input, callBack, view, args);
-            }
+            innerRequest(type, input, callBack, view, args);
         });
-        addOrStart(t);
+        t.start();
     }
 
     public static void request(RequestType type, Chayi input,
                                UserCallBack<?> callBack, Object... args) {
         Thread t = new Thread(() -> {
-            if (debug) {
-                if (lockMutual()) {
-                    innerRequest(type, input, callBack, null, args);
-                    unlock();
-                }
-                next();
-            } else {
-                innerRequest(type, input, callBack, null, args);
-            }
-
+            innerRequest(type, input, callBack, null, args);
         });
-        addOrStart(t);
+        t.start();
     }
 
     private static void innerRequest(RequestType type, Chayi input,
@@ -152,36 +135,18 @@ public class PipLine {
     public static void requestDisable(RequestType type, Class<? extends Chayi> input,
                                       UserCallBack<?> callBack, View view, Object... args) {
         Thread t = new Thread(() -> {
-            if (debug) {
-                if (lockMutual()) {
-                    innerRequest(type, input, callBack, view, args);
-                    unlock();
-                }
-                next();
-            } else {
-                innerRequest(type, input, callBack, view, args);
-            }
-
+            innerRequest(type, input, callBack, view, args);
         });
-        addOrStart(t);
+        t.start();
     }
 
 
     public static void request(RequestType type, Class<? extends Chayi> input,
                                UserCallBack<?> callBack, Object... args) {
         Thread t = new Thread(() -> {
-            if (debug) {
-                if (lockMutual()) {
-                    innerRequest(type, input, callBack, null, args);
-                    unlock();
-                }
-                next();
-            } else {
-                innerRequest(type, input, callBack, null, args);
-            }
-
+            innerRequest(type, input, callBack, null, args);
         });
-        addOrStart(t);
+        t.start();
     }
 
     private static void innerRequest(RequestType type, Class<? extends Chayi> input,
