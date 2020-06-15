@@ -1,5 +1,6 @@
 package ir.coleo.chayi;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
