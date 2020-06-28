@@ -14,6 +14,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * لایه‌ی اصلی ارتباط با سرور
+ * با استفاده از کتابخانه retrofit
+ */
 public class RequestLayer extends NetworkLayer {
 
     private NetworkLayer tempNextLayer;

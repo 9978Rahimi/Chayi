@@ -19,6 +19,9 @@ import ir.coleo.chayi.pipline.call_backs.UserCallBackSingleStatus;
 
 import static ir.coleo.chayi.pipline.layers.UrlLayer.getObjectName;
 
+/**
+ * لایه‌ی بررسی جواب برگشتی از سرور
+ */
 public class ResponseLayer extends NetworkLayer {
 
     public ResponseLayer(NetworkLayer nextLayer) {

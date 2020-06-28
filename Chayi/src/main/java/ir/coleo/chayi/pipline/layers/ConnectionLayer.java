@@ -8,6 +8,9 @@ import ir.coleo.chayi.constats.Constants;
 import ir.coleo.chayi.pipline.NetworkData;
 import ir.coleo.chayi.pipline.call_backs.FailReason;
 
+/**
+ * لایه‌ی که کار آن بررسی ارتباط به اینترنت است
+ */
 public class ConnectionLayer extends NetworkLayer {
 
     private NetworkLayer tempNextLayer;

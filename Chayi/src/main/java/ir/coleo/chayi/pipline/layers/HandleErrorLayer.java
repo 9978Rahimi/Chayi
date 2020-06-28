@@ -18,6 +18,9 @@ import ir.coleo.chayi.pipline.call_backs.FailReason;
 import ir.coleo.chayi.responseUtil.Error;
 import ir.hatamiarash.toast.RTLToast;
 
+/**
+ * لایه‌ی مدیریت خطا
+ */
 public class HandleErrorLayer extends NetworkLayer {
 
     private NetworkLayer tempNetworkLayer;

@@ -11,6 +11,9 @@ import ir.coleo.chayi.pipline.call_backs.FailReason;
 
 import static ir.coleo.chayi.constats.Constants.NO_TOKEN;
 
+/**
+ * لایه بررسی و فراهم کردن و ذخیره سازی توکن ارتباط با سرور
+ */
 public class TokenLayer extends NetworkLayer {
 
     private NetworkLayer tempNextLayer;

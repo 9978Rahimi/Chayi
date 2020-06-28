@@ -5,6 +5,9 @@ import android.app.Activity;
 import ir.coleo.chayi.constats.Constants;
 import ir.coleo.chayi.pipline.NetworkData;
 
+/**
+ * لایه‌ی ایی که شی از ui را فعال و غیر فعال می کند
+ */
 public class DisablerLayer extends NetworkLayer {
 
     private String TAG = getClass().getSimpleName();

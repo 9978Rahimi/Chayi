@@ -64,6 +64,11 @@ public class NetworkData {
         this(callBack, RequestType.GET, input);
     }
 
+    /**
+     * نتیجه‌ی کار هر لایه برای استفاده در بازگشت در داده همان ریکوست در hash_map ذخیره می شود.
+     * @param key
+     * @param value
+     */
     public void addResult(String key, Boolean value) {
         layerResult.put(key, value);
     }

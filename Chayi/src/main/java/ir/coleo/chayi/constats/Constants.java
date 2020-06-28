@@ -4,8 +4,15 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+/**
+ * برای استفاده در اولین قسمت برنامه خود
+ * متغییر های ‌
+ * restartActivity
+ * context
+ * base_url
+ * را مقدار دهی کنید
+ */
 public class Constants {
-
 
     public static String NO_TOKEN = "where is token";
     public static String TAG = "Constants chayi";

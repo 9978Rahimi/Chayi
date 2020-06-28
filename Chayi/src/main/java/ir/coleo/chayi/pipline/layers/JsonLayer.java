@@ -8,6 +8,9 @@ import ir.coleo.chayi.pipline.NetworkData;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 
+/**
+ * لایه ساختن json برای ارسال ریکوست
+ */
 public class JsonLayer extends NetworkLayer {
 
     private String TAG = getClass().getSimpleName();

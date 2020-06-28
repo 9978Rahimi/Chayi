@@ -7,10 +7,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import ir.coleo.chayi.pipline.NetworkData;
 import ir.coleo.chayi.pipline.SimpleIdlingResource;
 
+/**
+ * لایه‌ی تست با استفاده از SimpleIdlingResource , Espresso
+ *
+ */
 public class TestLayer extends NetworkLayer {
 
-
     private String TAG = getClass().getSimpleName();
+
     @NonNull
     private final SimpleIdlingResource mIdlingResource;
     private AtomicInteger count = new AtomicInteger(0);

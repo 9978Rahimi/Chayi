@@ -8,6 +8,9 @@ import ir.coleo.chayi.Chayi;
 import ir.coleo.chayi.pipline.NetworkData;
 import ir.coleo.chayi.pipline.RequestType;
 
+/**
+ * لایه مربوط به url
+ */
 public class UrlLayer extends NetworkLayer {
 
     private String TAG = getClass().getSimpleName();

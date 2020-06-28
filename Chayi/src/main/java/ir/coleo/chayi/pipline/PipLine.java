@@ -26,6 +26,15 @@ import ir.coleo.chayi.pipline.layers.TestLayer;
 import ir.coleo.chayi.pipline.layers.TokenLayer;
 import ir.coleo.chayi.pipline.layers.UrlLayer;
 
+/**
+ * سیستم چند لایه برای ارتباط با سرور
+ * ورودی و خروجی هر لایه شی از کلاس NetworkData است
+ * هر لایه عملیات مربوط به خود را انجام می‌دهد و لایه‌ی بعدی را صدا می‌زند
+ * کلاس به صورت single tone پیاده شده است
+ * <p>
+ * برای استفاده باید متد‌های static را call کنید
+ * request یا requestDisable
+ */
 public class PipLine {
 
     private static final String TAG = PipLine.class.getSimpleName();
@@ -38,6 +47,9 @@ public class PipLine {
     @Nullable
     private static SimpleIdlingResource mIdlingResource;
 
+    /**
+     * لایه هایی که می‌توان ارتباط را با آن‌ها شروع کرد
+     */
     private NetworkLayer disabler;
     private NetworkLayer connection;
     private NetworkLayer test;
@@ -83,6 +95,17 @@ public class PipLine {
         }
     }
 
+    /**
+     * @param type     نوع ریکوست
+     * @param input    نوع داده‌ی برگشتی
+     * @param callBack واسط برگشت داده به برنامه
+     * @param view     شی از برنامه که قصد غیر فعال کردن آن در هنگام ارتباط را دارید
+     * @param args     پارامتر های ورودی که برای ساختن شی ارتباط لازم هستند
+     *                 توجه کنید که در _ post_costume اولین پارامتر باید نام تابع موجود در input باشد
+     *                 <p>
+     *                 این تابع بر روی یک شی صدا زده می شود
+     *citizen/14/function
+     */
     public static void requestDisable(RequestType type, Chayi input,
                                       UserCallBack<?> callBack, View view, Object... args) {
         Thread t = new Thread(() -> {
@@ -132,6 +155,14 @@ public class PipLine {
         }
     }
 
+    /**
+     * @param type     نوع ریکوست
+     * @param input    نوع داده‌ی برگشتی
+     * @param callBack واسط برگشت داده به برنامه
+     * @param view     شی از برنامه که قصد غیر فعال کردن آن در هنگام ارتباط را دارید
+     * @param args     پارامتر های ورودی که برای ساختن شی ارتباط لازم هستند
+     *                 توجه کنید که در _ post_costume اولین پارامتر باید نام تابع موجود در input باشد
+     */
     public static void requestDisable(RequestType type, Class<? extends Chayi> input,
                                       UserCallBack<?> callBack, View view, Object... args) {
         Thread t = new Thread(() -> {
@@ -188,10 +219,17 @@ public class PipLine {
         }
     }
 
+
+    /**
+     * مشخص می کند که برنامه در حالت دیباگ است یا نه
+     */
     public static boolean isDebug() {
         return debug;
     }
 
+    /**
+     * مشخص می کند که برنامه در حالت دیباگ است یا نه
+     */
     public static void setDebug(boolean debug) {
         PipLine.debug = debug;
     }
