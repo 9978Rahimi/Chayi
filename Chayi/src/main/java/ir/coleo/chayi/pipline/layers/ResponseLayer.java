@@ -35,13 +35,16 @@ public class ResponseLayer extends NetworkLayer {
             JSONArray array = response.getJSONArray(UrlLayer.getAllUrl(input));
             ArrayList<T> list = new ArrayList<>();
             for (int i = 0; i < array.length(); i++) {
-                list.add(RetrofitSingleTone.getInstance().getGson().fromJson(array.getJSONObject(i).toString(), (Type) input));
+                T temp = RetrofitSingleTone.getInstance().getGson().fromJson(array.getJSONObject(i).toString(), (Type) input);
+                if (temp == null)
+                    return null;
+                list.add(temp);
             }
             return list;
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return new ArrayList<>();
+        return null;
     }
 
     private static <T> T singleParse(NetworkData data) {
@@ -68,38 +71,47 @@ public class ResponseLayer extends NetworkLayer {
                 switch (data.getRequestType()) {
                     case GET:
                         if (data.isSingle()) {
-                            if (data.getCallBack() instanceof UserCallBackSingle) {
-                                ((UserCallBackSingle) data.getCallBack()).success(singleParse(data));
-                                data.setHandled(true);
+                            Object o = singleParse(data);
+                            if (o == null) {
+                                data.getCallBack().fail(FailReason.NullResponse);
+                            } else if (data.getCallBack() instanceof UserCallBackSingle) {
+                                ((UserCallBackSingle) data.getCallBack()).success(o);
+
                             } else if (data.getCallBack() instanceof UserCallBackSingleStatus) {
-                                ((UserCallBackSingleStatus) data.getCallBack()).success(singleParse(data), data.getBodyResponse().code());
-                                data.setHandled(true);
+                                ((UserCallBackSingleStatus) data.getCallBack()).success(o, data.getBodyResponse().code());
                             }
                         } else {
-                            if (data.getCallBack() instanceof UserCallBackArray) {
-                                ((UserCallBackArray) data.getCallBack()).success(multiParse(data.getInput(), data.getResponse()));
-                                data.setHandled(true);
+                            ArrayList arrayList = multiParse(data.getInput(), data.getResponse());
+                            if (arrayList == null) {
+                                data.getCallBack().fail(FailReason.NullResponse);
+                            } else if (data.getCallBack() instanceof UserCallBackArray) {
+                                ((UserCallBackArray) data.getCallBack()).success(arrayList);
                             }
                         }
+                        data.setHandled(true);
                         break;
                     case PUT:
                     case POST:
                     case DELETE:
                     case CUSTOM_POST:
                         if (data.isSingle()) {
-                            if (data.getCallBack() instanceof UserCallBackSingle) {
-                                ((UserCallBackSingle) data.getCallBack()).success(responseParserPutOrPost(data.getInput(), data.getResponse()));
-                                data.setHandled(true);
+                            Object o = responseParserPutOrPost(data.getInput(), data.getResponse());
+                            if (o == null) {
+                                data.getCallBack().fail(FailReason.NullResponse);
+                            } else if (data.getCallBack() instanceof UserCallBackSingle) {
+                                ((UserCallBackSingle) data.getCallBack()).success(o);
                             } else if (data.getCallBack() instanceof UserCallBackSingleStatus) {
-                                ((UserCallBackSingleStatus) data.getCallBack()).success(responseParserPutOrPost(data.getInput(), data.getResponse()), data.getBodyResponse().code());
-                                data.setHandled(true);
+                                ((UserCallBackSingleStatus) data.getCallBack()).success(o, data.getBodyResponse().code());
                             }
                         } else {
-                            if (data.getCallBack() instanceof UserCallBackArray) {
-                                ((UserCallBackArray) data.getCallBack()).success(multiParse(data.getInput(), data.getResponse()));
-                                data.setHandled(true);
+                            ArrayList arrayList = multiParse(data.getInput(), data.getResponse());
+                            if (arrayList == null) {
+                                data.getCallBack().fail(FailReason.NullResponse);
+                            } else if (data.getCallBack() instanceof UserCallBackArray) {
+                                ((UserCallBackArray) data.getCallBack()).success(arrayList);
                             }
                         }
+                        data.setHandled(true);
                         break;
                 }
             if (data.isHandled()) {

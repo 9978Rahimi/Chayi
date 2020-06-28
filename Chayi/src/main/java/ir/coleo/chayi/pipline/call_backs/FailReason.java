@@ -8,6 +8,7 @@ public enum FailReason {
     Request,
     Server,
     Unknown,
+    NullResponse,
     Function_Name_Costume_Request
 
 }

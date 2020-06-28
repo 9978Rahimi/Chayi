@@ -12,8 +12,8 @@ public class Constants {
     public static String base_url = null;
     @SuppressLint("StaticFieldLeak")
     public static Context context = null;
-    private static String TOKEN_STORAGE = "someWhereInDarkness";
-    private static String TOKEN_DATA = "someWhereInDarkness12";
+    public static String TOKEN_STORAGE = "someWhereInDarkness";
+    public static String TOKEN_DATA = "someWhereInDarkness12";
     private static Class<?> restartActivity;
 
     public static Class<?> getRestartActivity() {
