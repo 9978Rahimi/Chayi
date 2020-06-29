@@ -9,8 +9,8 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode 35
-        versionName "0.10.18"
+        versionCode 36
+        versionName "0.10.19"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -92,7 +92,7 @@ artifacts {
 }
 
 group = 'ir.coleo.chayi'
-version = '0.10.18'
+version = '0.10.19'
 
 install {
     repositories.mavenInstaller {
@@ -105,7 +105,7 @@ install {
             packaging 'aar'
             groupId 'ir.coleo.chayi'
             artifactId 'Chayi'
-            version '0.10.18'
+            version '0.10.19'
 
             licenses {
                 license {
@@ -141,7 +141,7 @@ bintray {
         vcsUrl = 'https://github.com/9978Rahimi/Chayi'
         publish = true
         version {
-            name = '0.10.18'
+            name = '0.10.19'
             desc = 'nothing'
             released = new Date()
             vcsTag = 'v0.6.3'
