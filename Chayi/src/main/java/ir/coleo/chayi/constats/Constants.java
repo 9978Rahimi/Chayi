@@ -14,6 +14,9 @@ import android.content.SharedPreferences;
  */
 public class Constants {
 
+    public static String VERSION_NAME = "0.11.0";
+    public static int VERSION_CODE = 38;
+
     public static String NO_TOKEN = "where is token";
     public static String TAG = "Constants chayi";
     public static String base_url = null;

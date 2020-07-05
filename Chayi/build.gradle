@@ -9,8 +9,8 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode 36
-        versionName "0.10.19"
+        versionCode 38
+        versionName "0.11.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -29,6 +29,10 @@ android {
     testOptions {
         unitTests.includeAndroidResources = true
     }
+}
+
+preBuild.doFirst {
+    assert (file("../app/src/main/res/raw/chayi.json").exists() || file("../app/src/main/chayi.json").exists())
 }
 
 dependencies {
@@ -63,13 +67,6 @@ dependencies {
 
 }
 
-task hello {
-    println 'Hello from the configuration phase'
-    ext.greeting = 'Hey, how\'s it going?'
-
-    doLast { println "Greeting: $greeting" }
-}
-
 
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
@@ -92,7 +89,7 @@ artifacts {
 }
 
 group = 'ir.coleo.chayi'
-version = '0.10.19'
+version = '0.10.20'
 
 install {
     repositories.mavenInstaller {
@@ -105,7 +102,7 @@ install {
             packaging 'aar'
             groupId 'ir.coleo.chayi'
             artifactId 'Chayi'
-            version '0.10.19'
+            version '0.10.20'
 
             licenses {
                 license {
@@ -141,7 +138,7 @@ bintray {
         vcsUrl = 'https://github.com/9978Rahimi/Chayi'
         publish = true
         version {
-            name = '0.10.19'
+            name = '0.10.20'
             desc = 'nothing'
             released = new Date()
             vcsTag = 'v0.6.3'

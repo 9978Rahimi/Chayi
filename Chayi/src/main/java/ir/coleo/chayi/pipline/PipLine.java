@@ -1,5 +1,6 @@
 package ir.coleo.chayi.pipline;
 
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -74,7 +75,11 @@ public class PipLine {
             test = new TestLayer(disabler, getIdlingResource());
             layers.add(test);
         }
+        if (ChayiJsonParser.getInstance().getDataClasses() == null) {
+            Log.e(TAG, "PipLine: JSON problem");
+        }
     }
+
 
     private static PipLine getInstance() {
         if (instance == null) {
@@ -104,7 +109,7 @@ public class PipLine {
      *                 توجه کنید که در _ post_costume اولین پارامتر باید نام تابع موجود در input باشد
      *                 <p>
      *                 این تابع بر روی یک شی صدا زده می شود
-     *citizen/14/function
+     *                 citizen/14/function
      */
     public static void requestDisable(RequestType type, Chayi input,
                                       UserCallBack<?> callBack, View view, Object... args) {

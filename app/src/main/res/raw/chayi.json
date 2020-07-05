@@ -1,0 +1,45 @@
+{
+  "chayi": {
+    "version_name": "0.10.20",
+    "version_code": 37,
+    "base_url": "https://dev0.zimaapp.ir/api/av1/",
+    "classes": [
+      "Citizen",
+      "Driver"
+    ]
+  },
+  "classes": {
+    "Citizen": {
+      "plural_name": "citizens",
+      "single_name": "citizen",
+      "functions": [
+        "get_own_object",
+        "app_enter",
+        "app_create"
+      ],
+      "app_enter": {
+        "type": "GET",
+        "need_token": false,
+        "on_item": true,
+        "sending_data": {
+          "one": "String",
+          "two": "Integer",
+          "three": "Float",
+          "six": "Boolean",
+          "four": "class(XXX)",
+          "five": "list(XXX)"
+        },
+        "receive_data": {
+          "token": "String",
+          "citizen": "class(citizen)"
+        }
+      },
+      "app_create": {
+        "need_token": false,
+        "on_item": true
+      }
+    },
+    "Other_classes": {
+    }
+  }
+}
