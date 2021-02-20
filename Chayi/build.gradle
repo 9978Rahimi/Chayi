@@ -4,13 +4,13 @@ plugins {
     id 'com.jfrog.bintray'
 }
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 29
-        versionCode 38
-        versionName "0.11.0"
+        targetSdkVersion 30
+        versionCode 40
+        versionName "0.11.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -59,11 +59,16 @@ dependencies {
 
     implementation 'com.github.hatamiarash7:RTL-Toast:1.3'
     implementation 'androidx.annotation:annotation:1.1.0'
-    implementation 'androidx.test.espresso:espresso-idling-resource:3.2.0'
+    implementation 'androidx.test.espresso:espresso-idling-resource:3.3.0'
 
     implementation 'com.squareup.retrofit2:retrofit:2.8.1'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.squareup.retrofit2:converter-scalars:2.1.0'
+
+    implementation "androidx.security:security-crypto:1.1.0-alpha03"
+    // For Identity Credential APIs
+    implementation "androidx.security:security-identity-credential:1.0.0-alpha01"
+
 
 }
 
@@ -89,7 +94,7 @@ artifacts {
 }
 
 group = 'ir.coleo.chayi'
-version = '0.10.20'
+version = '0.11.2'
 
 install {
     repositories.mavenInstaller {
@@ -102,7 +107,7 @@ install {
             packaging 'aar'
             groupId 'ir.coleo.chayi'
             artifactId 'Chayi'
-            version '0.10.20'
+            version '0.11.2'
 
             licenses {
                 license {
@@ -138,10 +143,10 @@ bintray {
         vcsUrl = 'https://github.com/9978Rahimi/Chayi'
         publish = true
         version {
-            name = '0.10.20'
+            name = '0.11.2'
             desc = 'nothing'
             released = new Date()
-            vcsTag = 'v0.6.3'
+            vcsTag = 'v0.11.2'
         }
     }
 }
